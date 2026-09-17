@@ -44,7 +44,7 @@ export default function App(){
   },[sessionKind,dueItems,newItems,sessionLimit])
   const startPrimary=()=>{if(dueItems.length)setSessionKind('due');else if(newItems.length)setSessionKind('new')}
 
-  if(!state.onboardingComplete)return <div className={`app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
+  if(!state.onboardingComplete)return <div className={`app onboarding-app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
 
   const openModule=(module:string)=>{
     if(module==='verbs'&&availableByKind.irregular)setSessionKind('irregular')
