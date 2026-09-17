@@ -29,5 +29,5 @@ export function Progress({learner,stats}:{learner:LearnerState;stats:LearningSta
   </div>
 }
 
-function Evidence({label,state,detail}:{label:string;state:string;detail:string}){return <div className="skill"><span>{label}</span><div style={{height:'auto',background:'transparent'}}><small className="muted">{detail}</small></div><b style={{width:'auto'}}>{state}</b></div>}
+function Evidence({label,state,detail}:{label:string;state:string;detail:string}){return <div className="evidence-row"><div className="evidence-copy"><span>{label}</span><small>{detail}</small></div><b>{state}</b></div>}
 function Metric({title,value,hint}:{title:string;value:string;hint:string}){return <div className="stat-card metric"><span>{title}</span><strong>{value}</strong><small>{hint}</small></div>}
