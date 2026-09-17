@@ -16,6 +16,7 @@ import './styles.css'
 import './alignment.css'
 import './productivity.css'
 import './study-enhancements.css'
+import './verb-table.css'
 
 type SessionKind=ItemKind|'due'|'new'
 type Availability=Record<ItemKind,number>
@@ -48,7 +49,7 @@ export default function App(){
   if(!state.onboardingComplete)return <div className={`app onboarding-app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
 
   const openModule=(module:string)=>{
-    if(module==='verbs'&&availableByKind.irregular)setSessionKind('irregular')
+    if(module==='verbs')setTool('irregular-table')
     else if(module==='chunks'&&availableByKind.chunk)setSessionKind('chunk')
     else if(module==='review'&&dueItems.length)setSessionKind('due')
     else if(module==='new'&&newItems.length)setSessionKind('new')
@@ -74,7 +75,7 @@ export default function App(){
     </main>
     <BottomNav current={section} onChange={setSection}/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
-    {tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
+    {tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onStartIrregularTest={()=>{setTool(null);setSessionKind('irregular')}} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
   </div>
 }
 
