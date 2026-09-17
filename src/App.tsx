@@ -15,6 +15,7 @@ import type { ItemKind,LearningTool,NavSection } from './types'
 import './styles.css'
 import './alignment.css'
 import './productivity.css'
+import './study-enhancements.css'
 
 type SessionKind=ItemKind|'due'|'new'
 type Availability=Record<ItemKind,number>
