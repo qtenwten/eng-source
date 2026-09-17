@@ -5,18 +5,24 @@ export const learningItems: LearningItem[] = [
   {id:'chunk-figure-out',kind:'chunk',prompt:'разобраться / понять',answer:'figure out',translation:'разобраться, понять',example:'I finally figured out how the system works.',note:'Useful chunk: figure out how / why / what',tags:['B1','phrasal verb']},
   {id:'chunk-turn-out',kind:'chunk',prompt:'оказаться / выясниться',answer:'turn out',translation:'оказаться, выясниться',example:'It turned out to be much easier than we expected.',tags:['B1','phrasal verb']},
   {id:'chunk-take-care',kind:'chunk',prompt:'я этим займусь',answer:"I'll take care of it.",translation:'Я этим займусь.',example:"Don't worry about the booking. I'll take care of it.",tags:['A2','conversation']},
-  {id:'verb-go',kind:'irregular',prompt:'go → ? → ?',answer:'went → gone',translation:'идти / ехать',example:"I've already gone through the report.",note:'Past Simple: went · Past Participle: gone',tags:['A1','irregular verb']},
+  {id:'verb-go',kind:'irregular',prompt:'go → ? → ?',answer:'went → gone',translation:'идти / ехать',example:"She's already gone home.",note:'Past Simple: went · Past Participle: gone',tags:['A1','irregular verb']},
   {id:'verb-seek',kind:'irregular',prompt:'seek → ? → ?',answer:'sought → sought',translation:'искать, стремиться',example:'They sought advice before making the decision.',tags:['B2','irregular verb']},
   {id:'chunk-make-decision',kind:'chunk',prompt:'принять решение',answer:'make a decision',translation:'принять решение',example:'We need to make a decision by Friday.',note:'Not “do a decision”.',tags:['A2','collocation','work']},
   {id:'word-awkward',kind:'word',prompt:'неловкий / неудобный',answer:'awkward',translation:'неловкий / неудобный',example:'There was an awkward silence after the question.',tags:['B1','emotion']},
   {id:'chunk-depend-on',kind:'chunk',prompt:'зависеть от',answer:'depend on',translation:'зависеть от',example:'It depends on what you want to achieve.',note:'Common Russian-speaker error: depend from ✕',tags:['A2','preposition','error pattern']},
+  {id:'word-eventually',kind:'word',prompt:'в конце концов / со временем',answer:'eventually',translation:'в конце концов, со временем',example:'I eventually figured out what was causing the problem.',tags:['B1','conversation']},
+  {id:'chunk-used-to',kind:'chunk',prompt:'раньше обычно / раньше было так',answer:'used to',translation:'раньше обычно; раньше было так',example:'I used to work late, but now I finish earlier.',note:'used to + base verb describes a past habit or state that is no longer true.',tags:['A2','grammar pattern','conversation']},
+  {id:'word-recently',kind:'word',prompt:'недавно / в последнее время',answer:'recently',translation:'недавно, в последнее время',example:"I've been reading more in English recently.",tags:['A2','conversation']},
+  {id:'chunk-supposed-to',kind:'chunk',prompt:'должен был / предполагалось',answer:'was supposed to',translation:'должен был; предполагалось',example:'I was supposed to call him, but the plan changed.',tags:['B1','grammar pattern','conversation']},
+  {id:'word-instead',kind:'word',prompt:'вместо этого',answer:'instead',translation:'вместо этого',example:'The café was closed, so we went somewhere else instead.',tags:['A2','conversation']},
+  {id:'word-probably',kind:'word',prompt:'вероятно / скорее всего',answer:'probably',translation:'вероятно, скорее всего',example:"I'll probably stay home tonight.",tags:['A2','conversation']},
 ]
 
 export const todayPlan = [
-  {id:'new',icon:'✦',title:'Новое',subtitle:'до 5 элементов',tone:'blue'},
+  {id:'new',icon:'✦',title:'Новое',subtitle:'адаптивная очередь',tone:'blue'},
   {id:'review',icon:'↻',title:'Повторение',subtitle:'по расписанию',tone:'green'},
   {id:'chunks',icon:'◌',title:'Выражения',subtitle:'chunks & collocations',tone:'purple'},
   {id:'verbs',icon:'⚡',title:'Неправильные глаголы',subtitle:'формы в контексте',tone:'orange'},
-  {id:'listening',icon:'◉',title:'Аудирование',subtitle:'следующий модуль',tone:'red'},
-  {id:'speaking',icon:'◎',title:'Разговор',subtitle:'следующий модуль',tone:'cyan'},
+  {id:'listening',icon:'◉',title:'Аудирование',subtitle:'audio first',tone:'red'},
+  {id:'speaking',icon:'◎',title:'Говорение и письмо',subtitle:'spaced output',tone:'cyan'},
 ]

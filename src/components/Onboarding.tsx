@@ -26,7 +26,7 @@ export function Onboarding({onComplete}:Props){
   const[goal,setGoal]=useState<LearningGoal>('general')
   const[dailyMinutes,setDailyMinutes]=useState(15)
   const[level,setLevel]=useState('A2–B1')
-  const finish=()=>onComplete({name:name.trim()||'Learner',goal,dailyMinutes,level})
+  const finish=()=>onComplete({name:name.trim(),goal,dailyMinutes,level})
   return <main className="onboarding-shell">
     <div className="onboarding-brand"><span className="brand-mark">s</span><strong>sENG</strong></div>
     <section className="onboarding-card" aria-live="polite">
@@ -36,19 +36,19 @@ export function Onboarding({onComplete}:Props){
         <div className="choice-list">{goals.map(item=><button key={item.id} className={`choice-card ${goal===item.id?'selected':''}`} onClick={()=>setGoal(item.id)}><span className="choice-icon">{item.icon}</span><span><strong>{item.title}</strong><small>{item.copy}</small></span><b>✓</b></button>)}</div>
       </div>}
       {step===1&&<div className="onboarding-step compact-step">
-        <p className="eyebrow">ABOUT YOU</p><h1>Как к тебе обращаться?</h1><p className="onboarding-lead">Можно оставить пустым — это никак не влияет на обучение.</p>
+        <p className="eyebrow">ABOUT YOU</p><h1>Как к тебе обращаться?</h1><p className="onboarding-lead">Можно оставить пустым — интерфейс просто будет использовать нейтральное приветствие.</p>
         <label className="name-field"><span>Имя</span><input autoFocus value={name} onChange={event=>setName(event.target.value)} placeholder="Например, Арсений" maxLength={40}/></label>
         <div className="privacy-note"><span>◎</span><p><strong>Без лишней анкеты.</strong><br/>На старте нам не нужны возраст, пол или десяток маркетинговых вопросов.</p></div>
       </div>}
       {step===2&&<div className="onboarding-step compact-step">
-        <p className="eyebrow">DAILY RHYTHM</p><h1>Сколько времени обычно удобно?</h1><p className="onboarding-lead">Это не обязательство и не штрафной streak. Время нужно, чтобы собирать реалистичную сессию.</p>
+        <p className="eyebrow">DAILY RHYTHM</p><h1>Сколько времени обычно удобно?</h1><p className="onboarding-lead">Это не обязательство и не штрафной streak. Время используется, чтобы подобрать реалистичный размер ближайшей сессии.</p>
         <div className="minutes-grid">{minuteOptions.map(minutes=><button key={minutes} className={dailyMinutes===minutes?'selected':''} onClick={()=>setDailyMinutes(minutes)}><strong>{minutes}</strong><span>минут</span></button>)}</div>
-        <p className="micro-copy">При необходимости sENG сможет собрать и пяти­минутную сессию — прогресс не обнулится.</p>
+        <p className="micro-copy">Настройку можно изменить позже в профиле — прогресс не обнулится.</p>
       </div>}
       {step===3&&<div className="onboarding-step">
-        <p className="eyebrow">STARTING POINT</p><h1>Как примерно оценишь уровень?</h1><p className="onboarding-lead">Это только стартовая гипотеза. Приложение будет уточнять профиль по реальным ответам, а не верить одной самооценке.</p>
+        <p className="eyebrow">STARTING POINT</p><h1>Как примерно оценишь уровень?</h1><p className="onboarding-lead">Это только стартовая гипотеза. Сейчас она помогает не подсовывать слишком сложный новый материал раньше времени.</p>
         <div className="level-grid">{levelOptions.map(item=><button key={item.id} className={`level-choice ${level===item.id?'selected':''}`} onClick={()=>setLevel(item.id)}><strong>{item.title}</strong><small>{item.copy}</small></button>)}</div>
-        <div className="diagnostic-note">После первого релиза сюда добавится короткая адаптивная диагностика vocabulary + grammar + listening.</div>
+        <div className="diagnostic-note">Отдельная адаптивная диагностика vocabulary + grammar + listening остаётся следующим важным модулем; до неё sENG не выдаёт самооценку за точный измеренный уровень.</div>
       </div>}
       <footer className="onboarding-actions">{step>0?<button className="secondary-button" onClick={()=>setStep(value=>value-1)}>Назад</button>:<span/>}{step<3?<button className="onboarding-next" onClick={()=>setStep(value=>value+1)}>Продолжить <span>→</span></button>:<button className="onboarding-next" onClick={finish}>Начать обучение <span>→</span></button>}</footer>
     </section>

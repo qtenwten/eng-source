@@ -3,7 +3,7 @@ import type { ItemKind,LearningTool } from '../types'
 
 type Availability=Record<ItemKind,number>
 const groups:Array<{kind:ItemKind;title:string;description:string;icon:string}>=[
-  {kind:'word',title:'Словарь',description:'Активное вспоминание, произношение и контекст',icon:'Aa'},
+  {kind:'word',title:'Словарь',description:'Активное вспоминание, звук и контекст',icon:'Aa'},
   {kind:'chunk',title:'Выражения и collocations',description:'Фразы, которыми реально строится речь',icon:'⌘'},
   {kind:'irregular',title:'Неправильные глаголы',description:'Формы через контекст, а не мёртвую таблицу',icon:'↯'},
 ]
@@ -11,7 +11,7 @@ const tools:Array<{id:LearningTool;title:string;description:string;icon:string}>
   {id:'inbox',title:'Personal Inbox',description:'Добавляй слова и фразы из фильмов, игр, YouTube и жизни',icon:'＋'},
   {id:'reading',title:'Чтение',description:'Понимать смысл без постоянного перевода и сохранять полезные chunks',icon:'R'},
   {id:'listening',title:'Аудирование',description:'Сначала звук, затем transcript как временная поддержка',icon:'▶'},
-  {id:'active',title:'Активный словарь',description:'От «узнаю» до свободного использования, а не один счётчик',icon:'A'},
+  {id:'active',title:'Активный словарь',description:'От «узнаю» до подтверждённого использования, а не один счётчик',icon:'A'},
 ]
 
 export function Learn({availability,onStartKind,onOpenTool}:{availability:Availability;onStartKind:(kind:ItemKind)=>void;onOpenTool:(tool:LearningTool)=>void}){
