@@ -61,7 +61,7 @@ export default function App(){
       <div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div>
       <p className="brand-tagline">English that stays.</p>
       <Sidebar section={section} onChange={setSection}/>
-      <div className="sidebar-bottom"><ThemeControls themeStyle={state.themeStyle} colorMode={state.colorMode} onThemeStyle={setThemeStyle} onColorMode={setColorMode}/><div className="mini-profile"><span>{state.name.slice(0,1).toUpperCase()}</span><div><strong>{state.name}</strong><small>{state.level} · 🔥 {stats.streak}</small></div></div></div>
+      <div className="sidebar-bottom"><ThemeControls themeStyle={state.themeStyle} colorMode={state.colorMode} onThemeStyle={setThemeStyle} onColorMode={setColorMode}/><div className="mini-profile"><span>{state.name.slice(0,1).toUpperCase()||'S'}</span><div><strong>{state.name||'Профиль'}</strong><small>{state.level} · 🔥 {stats.streak}</small></div></div></div>
     </aside>
     <main className="main-content">
       <header className="mobile-topbar"><div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div><span className="level-chip">{state.level}</span></header>
