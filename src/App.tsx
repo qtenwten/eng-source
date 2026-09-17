@@ -12,7 +12,7 @@ import { ThemeControls } from './components/ThemeControls'
 import { Onboarding } from './components/Onboarding'
 import { LearningTools } from './components/LearningTools'
 import { IrregularVerbTable } from './components/IrregularVerbTable'
-import type { ItemKind,LearningTool,NavSection } from './types'
+import type { AppTool,ItemKind,NavSection } from './types'
 import './styles.css'
 import './alignment.css'
 import './productivity.css'
@@ -28,7 +28,7 @@ export default function App(){
   const{state,allItems,dueItems,newItems,stats,setThemeStyle,setColorMode,completeOnboarding,updateLearningPreferences,rateItem,addInbox,addManualError,practiceError,recordActivity,recordProduction,resetProgress}=useLearner()
   const[section,setSection]=useState<NavSection>('today')
   const[sessionKind,setSessionKind]=useState<SessionKind|null>(null)
-  const[tool,setTool]=useState<LearningTool|null>(null)
+  const[tool,setTool]=useState<AppTool|null>(null)
   const[systemTick,setSystemTick]=useState(0)
 
   useEffect(()=>{const media=window.matchMedia('(prefers-color-scheme: dark)');const handler=()=>setSystemTick(value=>value+1);media.addEventListener?.('change',handler);return()=>media.removeEventListener?.('change',handler)},[])
