@@ -1,0 +1,3 @@
+import type { NavSection } from '../types'
+const tabs:Array<{id:NavSection;icon:string;label:string}>=[{id:'today',icon:'⌂',label:'Сегодня'},{id:'learn',icon:'▤',label:'Учить'},{id:'practice',icon:'↻',label:'Практика'},{id:'progress',icon:'⌁',label:'Прогресс'},{id:'profile',icon:'○',label:'Профиль'}]
+export function BottomNav({current,onChange}:{current:NavSection;onChange:(tab:NavSection)=>void}){return <nav className="bottom-nav" aria-label="Основная навигация">{tabs.map(tab=><button key={tab.id} className={current===tab.id?'active':''} onClick={()=>onChange(tab.id)}><span className="nav-icon">{tab.icon}</span><span>{tab.label}</span></button>)}</nav>}

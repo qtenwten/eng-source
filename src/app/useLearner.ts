@@ -1,0 +1,6 @@
+import { useEffect,useMemo,useState } from 'react'
+import { learningItems } from '../data/seed'
+import { createMemoryState,isDue,reviewMemory } from '../lib/srs'
+import { loadLearner,saveLearner } from '../lib/storage'
+import type { ColorMode,LearnerState,ReviewRating,ThemeStyle } from '../types'
+export function useLearner(){const[state,setState]=useState<LearnerState>(()=>loadLearner());useEffect(()=>{saveLearner(state)},[state]);const dueItems=useMemo(()=>learningItems.filter(item=>isDue(state.memory[item.id])),[state.memory]);const setThemeStyle=(themeStyle:ThemeStyle)=>setState(current=>({...current,themeStyle}));const setColorMode=(colorMode:ColorMode)=>setState(current=>({...current,colorMode}));const rateItem=(itemId:string,rating:ReviewRating)=>{const now=Date.now();setState(current=>{const previous=current.memory[itemId]??createMemoryState(itemId,now);const next=reviewMemory(previous,rating,now);return{...current,memory:{...current.memory,[itemId]:next},reviewLog:[...current.reviewLog,{id:`${itemId}:${now}`,itemId,rating,reviewedAt:now,previousDueAt:previous.dueAt,nextDueAt:next.dueAt}].slice(-500)}})};const resetProgress=()=>setState(current=>({...current,memory:{},reviewLog:[]}));return{state,dueItems,setThemeStyle,setColorMode,rateItem,resetProgress}}
