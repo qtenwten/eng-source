@@ -1,6 +1,69 @@
-import type { MemoryState, ReviewRating } from '../types'
-const DAY=86_400_000, MINUTE=60_000
-export function createMemoryState(itemId:string,now=Date.now()):MemoryState{return{itemId,stability:.45,difficulty:5,dueAt:now,reviews:0,lapses:0}}
-export function reviewMemory(previous:MemoryState,rating:ReviewRating,now=Date.now()):MemoryState{const elapsedDays=previous.lastReviewedAt?Math.max(0,(now-previous.lastReviewedAt)/DAY):0;const recallPressure=Math.min(1.8,1+elapsedDays/Math.max(previous.stability,.2)*.12);let stability=previous.stability,difficulty=previous.difficulty,lapses=previous.lapses;switch(rating){case'again':stability=Math.max(.18,previous.stability*.38);difficulty=Math.min(10,previous.difficulty+.7);lapses+=1;break;case'hard':stability=Math.max(.6,previous.stability*1.25*recallPressure);difficulty=Math.min(10,previous.difficulty+.2);break;case'good':stability=Math.max(1,previous.stability*(2.05-previous.difficulty*.055)*recallPressure);difficulty=Math.max(1,previous.difficulty-.08);break;case'easy':stability=Math.max(2.4,previous.stability*(2.75-previous.difficulty*.045)*recallPressure);difficulty=Math.max(1,previous.difficulty-.45);break}const delay=rating==='again'?8*MINUTE:Math.max(.5,stability)*DAY;return{...previous,stability:Math.round(stability*100)/100,difficulty:Math.round(difficulty*100)/100,dueAt:now+delay,reviews:previous.reviews+1,lapses,lastReviewedAt:now}}
-export function isDue(memory:MemoryState|undefined,now=Date.now()){return !memory||memory.dueAt<=now}
-export function formatNextReview(dueAt:number,now=Date.now()){const diff=dueAt-now;if(diff<=0)return'сейчас';const minutes=Math.round(diff/MINUTE);if(minutes<60)return`через ${minutes} мин`;const hours=Math.round(diff/(60*MINUTE));if(hours<24)return`через ${hours} ч`;return`через ${Math.round(diff/DAY)} дн`}
+import { createEmptyCard,fsrs,Rating,type Card } from 'ts-fsrs'
+import type { MemoryState,ReviewRating } from '../types'
+
+const DAY=86_400_000
+const MINUTE=60_000
+const scheduler=fsrs({
+  request_retention:.9,
+  maximum_interval:3650,
+  enable_fuzz:true,
+  enable_short_term:true,
+  learning_steps:['10m'],
+  relearning_steps:['10m'],
+})
+
+const ratings:Record<ReviewRating,Rating>={
+  again:Rating.Again,
+  hard:Rating.Hard,
+  good:Rating.Good,
+  easy:Rating.Easy,
+}
+
+function restoreCard(memory:MemoryState|undefined):Card{
+  if(!memory)return createEmptyCard()
+  return {
+    due:new Date(memory.dueAt),
+    stability:memory.stability,
+    difficulty:memory.difficulty,
+    elapsed_days:memory.elapsedDays,
+    scheduled_days:memory.scheduledDays,
+    learning_steps:memory.learningSteps,
+    reps:memory.reviews,
+    lapses:memory.lapses,
+    state:memory.state as Card['state'],
+    ...(memory.lastReviewedAt?{last_review:new Date(memory.lastReviewedAt)}:{}),
+  }
+}
+
+export function reviewMemory(previous:MemoryState|undefined,itemId:string,rating:ReviewRating,now=Date.now()):MemoryState{
+  const result=scheduler.next(restoreCard(previous),new Date(now),ratings[rating])
+  const card=result.card
+  return {
+    itemId,
+    dueAt:card.due.getTime(),
+    stability:card.stability,
+    difficulty:card.difficulty,
+    elapsedDays:card.elapsed_days,
+    scheduledDays:card.scheduled_days,
+    learningSteps:card.learning_steps,
+    reviews:card.reps,
+    lapses:card.lapses,
+    state:card.state,
+    lastReviewedAt:card.last_review?.getTime()??now,
+    lastRating:rating,
+  }
+}
+
+export function isDue(memory:MemoryState|undefined,now=Date.now()){
+  return Boolean(memory&&memory.dueAt<=now)
+}
+
+export function formatNextReview(dueAt:number,now=Date.now()){
+  const diff=dueAt-now
+  if(diff<=0)return'сейчас'
+  const minutes=Math.max(1,Math.round(diff/MINUTE))
+  if(minutes<60)return`через ${minutes} мин`
+  const hours=Math.round(diff/(60*MINUTE))
+  if(hours<24)return`через ${hours} ч`
+  return`через ${Math.round(diff/DAY)} дн`
+}
