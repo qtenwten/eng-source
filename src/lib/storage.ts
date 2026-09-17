@@ -13,16 +13,32 @@ export const defaultLearnerState: LearnerState = {
   colorMode:'system',
   memory:{},
   reviewLog:[],
+  inbox:[],
+  errors:[],
+  productiveAttempts:[],
+  activityLog:[],
 }
 
 export function loadLearner(): LearnerState {
   try {
     const raw=localStorage.getItem(KEY)
-    if(raw)return {...defaultLearnerState,...JSON.parse(raw),memory:JSON.parse(raw).memory??{},reviewLog:JSON.parse(raw).reviewLog??[]}
+    if(raw){
+      const parsed=JSON.parse(raw) as Partial<LearnerState>
+      return {
+        ...defaultLearnerState,
+        ...parsed,
+        memory:parsed.memory??{},
+        reviewLog:parsed.reviewLog??[],
+        inbox:parsed.inbox??[],
+        errors:parsed.errors??[],
+        productiveAttempts:parsed.productiveAttempts??[],
+        activityLog:parsed.activityLog??[],
+      }
+    }
     const legacy=localStorage.getItem(LEGACY_KEY)
     if(!legacy)return defaultLearnerState
     const parsed=JSON.parse(legacy) as Partial<LearnerState>
-    return {...defaultLearnerState,...parsed,memory:{},reviewLog:[]}
+    return {...defaultLearnerState,...parsed,memory:{},reviewLog:[],inbox:[],errors:[],productiveAttempts:[],activityLog:[]}
   } catch {
     return defaultLearnerState
   }

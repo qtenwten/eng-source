@@ -10,17 +10,20 @@ import { Profile } from './components/Profile'
 import { StudySession } from './components/StudySession'
 import { ThemeControls } from './components/ThemeControls'
 import { Onboarding } from './components/Onboarding'
-import type { ItemKind,NavSection } from './types'
+import { LearningTools } from './components/LearningTools'
+import type { ItemKind,LearningTool,NavSection } from './types'
 import './styles.css'
 import './alignment.css'
+import './productivity.css'
 
 type SessionKind=ItemKind|'due'|'new'
 type Availability=Record<ItemKind,number>
 
 export default function App(){
-  const{state,dueItems,newItems,stats,setThemeStyle,setColorMode,completeOnboarding,rateItem,resetProgress}=useLearner()
+  const{state,allItems,dueItems,newItems,stats,setThemeStyle,setColorMode,completeOnboarding,rateItem,addInbox,addManualError,practiceError,recordActivity,recordProduction,resetProgress}=useLearner()
   const[section,setSection]=useState<NavSection>('today')
   const[sessionKind,setSessionKind]=useState<SessionKind|null>(null)
+  const[tool,setTool]=useState<LearningTool|null>(null)
   const[systemTick,setSystemTick]=useState(0)
 
   useEffect(()=>{const media=window.matchMedia('(prefers-color-scheme: dark)');const handler=()=>setSystemTick(value=>value+1);media.addEventListener?.('change',handler);return()=>media.removeEventListener?.('change',handler)},[])
@@ -34,14 +37,9 @@ export default function App(){
     if(!sessionKind)return[]
     if(sessionKind==='due')return dueItems.slice(0,7)
     if(sessionKind==='new')return newItems.slice(0,7)
-    const scheduled=dueItems.filter(item=>item.kind===sessionKind)
-    const unseen=newItems.filter(item=>item.kind===sessionKind)
-    return [...scheduled,...unseen].slice(0,7)
+    return [...dueItems.filter(item=>item.kind===sessionKind),...newItems.filter(item=>item.kind===sessionKind)].slice(0,7)
   },[sessionKind,dueItems,newItems])
-  const startPrimary=()=>{
-    if(dueItems.length)setSessionKind('due')
-    else if(newItems.length)setSessionKind('new')
-  }
+  const startPrimary=()=>{if(dueItems.length)setSessionKind('due');else if(newItems.length)setSessionKind('new')}
 
   if(!state.onboardingComplete)return <div className={`app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
 
@@ -50,6 +48,8 @@ export default function App(){
     else if(module==='chunks'&&availableByKind.chunk)setSessionKind('chunk')
     else if(module==='review'&&dueItems.length)setSessionKind('due')
     else if(module==='new'&&newItems.length)setSessionKind('new')
+    else if(module==='listening')setTool('listening')
+    else if(module==='speaking')setTool('production')
     else if(module==='settings')setSection('profile')
   }
 
@@ -63,13 +63,14 @@ export default function App(){
     <main className="main-content">
       <header className="mobile-topbar"><div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div><span className="level-chip">{state.level}</span></header>
       {section==='today'&&<Today learner={state} stats={stats} dueCount={dueItems.length} newCount={newItems.length} availability={availableByKind} onStart={startPrimary} onOpenModule={openModule}/>} 
-      {section==='learn'&&<Learn availability={availableByKind} onStartKind={setSessionKind}/>} 
-      {section==='practice'&&<Practice dueCount={dueItems.length} newCount={newItems.length} onStart={startPrimary}/>} 
+      {section==='learn'&&<Learn availability={availableByKind} onStartKind={setSessionKind} onOpenTool={setTool}/>} 
+      {section==='practice'&&<Practice dueCount={dueItems.length} newCount={newItems.length} onStart={startPrimary} onOpenTool={setTool}/>} 
       {section==='progress'&&<Progress learner={state} stats={stats}/>} 
       {section==='profile'&&<Profile learner={state} stats={stats} onThemeStyle={setThemeStyle} onColorMode={setColorMode} onReset={resetProgress}/>} 
     </main>
     <BottomNav current={section} onChange={setSection}/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
+    {tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
   </div>
 }
 
