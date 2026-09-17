@@ -1,4 +1,4 @@
-import { createEmptyCard,fsrs,Rating,type Card } from 'ts-fsrs'
+import { createEmptyCard,fsrs,type Card,type Grade } from 'ts-fsrs'
 import type { MemoryState,ReviewRating } from '../types'
 
 const DAY=86_400_000
@@ -12,12 +12,7 @@ const scheduler=fsrs({
   relearning_steps:['10m'],
 })
 
-const ratings:Record<ReviewRating,Rating>={
-  again:Rating.Again,
-  hard:Rating.Hard,
-  good:Rating.Good,
-  easy:Rating.Easy,
-}
+const ratings:Record<ReviewRating,Grade>={again:1,hard:2,good:3,easy:4}
 
 function restoreCard(memory:MemoryState|undefined):Card{
   if(!memory)return createEmptyCard()
