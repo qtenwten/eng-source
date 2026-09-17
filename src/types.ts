@@ -17,7 +17,8 @@ export interface LearningItem {
   answer: string
   translation: string
   example: string
-  exampleTranslation: string
+  /** Built-in content should provide this; personal Inbox context may not have a full-sentence translation yet. */
+  exampleTranslation?: string
   irregularForms?: IrregularForms
   note?: string
   tags: string[]
