@@ -9,14 +9,14 @@ export const readingTexts=[
   {
     id:'reading-problem-solving',title:'How people figure things out',cefr:'B1–B2',minutes:5,
     text:'When a problem first appears, the answer is rarely obvious. People test ideas, notice what went wrong, and gradually figure out what works. The useful part is not avoiding every mistake, but learning how to respond when something does not turn out as expected.',
-    targets:[['figure out','разобраться, понять'],['go wrong','пойти не так'],['turn out','оказаться в итоге']],
+    targets:[['figure out','разобраться, понять'],['go wrong','пойти не так'],['turn out','оказаться, выясниться']],
   },
 ]
 
 export const listeningClips=[
-  {id:'listen-1',cefr:'A2–B1',text:'I was about to leave when he called me back.',translation:'Я уже собирался уходить, когда он перезвонил.',target:'be about to'},
-  {id:'listen-2',cefr:'B1',text:'It turned out that we had been talking about the same person.',translation:'Оказалось, что мы говорили об одном и том же человеке.',target:'turn out'},
-  {id:'listen-3',cefr:'B1',text:'I eventually figured out why the app was not working.',translation:'В конце концов я понял, почему приложение не работало.',target:'eventually / figure out'},
+  {id:'listen-1',cefr:'A2–B1',text:'I was about to leave when he called me back.',translation:'Я уже собирался уходить, когда он перезвонил.',targets:[['be about to','собираться что-то сделать прямо сейчас']]},
+  {id:'listen-2',cefr:'B1',text:'It turned out that we had been talking about the same person.',translation:'Оказалось, что мы говорили об одном и том же человеке.',targets:[['turn out','оказаться, выясниться']]},
+  {id:'listen-3',cefr:'B1',text:'I eventually figured out why the app was not working.',translation:'В конце концов я понял, почему приложение не работало.',targets:[['eventually','в конце концов, со временем'],['figure out','разобраться, понять']]},
 ]
 
 export const productiveTasks:Array<{id:string;mode:ProductiveMode;title:string;prompt:string;targets:string[];repeatAfterDays:number}>=[
