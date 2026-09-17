@@ -8,3 +8,22 @@
 .level-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.level-choice{min-height:100px;text-align:left;border:1px solid var(--border);border-radius:16px;background:var(--surface-strong);color:var(--text);padding:14px}.level-choice strong,.level-choice small{display:block}.level-choice strong{font-size:20px}.level-choice small{margin-top:6px;color:var(--muted);line-height:1.4}.diagnostic-note{margin-top:14px;padding:12px 14px;border-radius:13px;background:color-mix(in srgb,var(--accent) 8%,var(--surface-strong));color:var(--muted);font-size:12px;line-height:1.5}
 .onboarding-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px 18px;border-top:1px solid var(--border)}.onboarding-actions .secondary-button{background:transparent;color:var(--muted);border:1px solid var(--border)}.onboarding-next{min-height:46px;border:0;border-radius:14px;padding:0 18px;background:var(--accent);color:white;font-weight:900;display:inline-flex;align-items:center;gap:18px}.onboarding-next:hover{background:var(--accent-strong)}.onboarding-footnote{width:min(100%,760px);margin:0 auto;text-align:center;color:var(--muted);font-size:10px;letter-spacing:.04em;line-height:1.5}
 @media(min-width:700px){.onboarding-shell{padding-left:28px;padding-right:28px}.onboarding-step{padding:38px 40px 18px}.onboarding-actions{padding:18px 40px 28px}.choice-list{grid-template-columns:repeat(2,minmax(0,1fr))}.choice-card:last-child{grid-column:1/-1}.level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.minutes-grid{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none}.compact-step{min-height:450px}}
+@media(min-width:980px){
+  .onboarding-app{display:block;min-height:100vh}
+  .onboarding-app .onboarding-shell{width:100%;min-height:100vh;padding:32px clamp(32px,5vw,72px) 28px;grid-template-rows:auto minmax(0,1fr) auto}
+  .onboarding-app .onboarding-brand,.onboarding-app .onboarding-card,.onboarding-app .onboarding-footnote{width:min(100%,940px)}
+  .onboarding-app .onboarding-card{align-self:center;border-radius:30px}
+  .onboarding-app .onboarding-step{padding:42px 46px 22px}
+  .onboarding-app .onboarding-step h1{font-size:clamp(42px,4vw,58px);max-width:720px}
+  .onboarding-app .onboarding-lead{max-width:720px;font-size:16px}
+  .onboarding-app .choice-list{gap:12px}
+  .onboarding-app .choice-card{min-height:92px;padding:16px 18px}
+  .onboarding-app .level-choice{min-height:118px;padding:18px}
+  .onboarding-app .minutes-grid button{min-height:110px}
+  .onboarding-app .onboarding-actions{padding:20px 46px 30px}
+}
+@media(min-width:1400px){
+  .onboarding-app .onboarding-brand,.onboarding-app .onboarding-card,.onboarding-app .onboarding-footnote{width:min(100%,1020px)}
+  .onboarding-app .onboarding-step{padding-left:54px;padding-right:54px}
+  .onboarding-app .onboarding-actions{padding-left:54px;padding-right:54px}
+}
