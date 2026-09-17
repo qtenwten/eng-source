@@ -11,6 +11,7 @@ import { StudySession } from './components/StudySession'
 import { ThemeControls } from './components/ThemeControls'
 import { Onboarding } from './components/Onboarding'
 import { LearningTools } from './components/LearningTools'
+import { IrregularVerbTable } from './components/IrregularVerbTable'
 import type { ItemKind,LearningTool,NavSection } from './types'
 import './styles.css'
 import './alignment.css'
@@ -75,7 +76,7 @@ export default function App(){
     </main>
     <BottomNav current={section} onChange={setSection}/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
-    {tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onStartIrregularTest={()=>{setTool(null);setSessionKind('irregular')}} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
+    {tool==='irregular-table'?<IrregularVerbTable onClose={()=>setTool(null)} onStartTest={()=>{setTool(null);setSessionKind('irregular')}}/>:tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
   </div>
 }
 
