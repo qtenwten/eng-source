@@ -8,7 +8,7 @@
 
 > Understand it. Retrieve it. Use it. Meet it again. Make it automatic.
 
-The learning design is documented in [`docs/LEARNING_BLUEPRINT.md`](docs/LEARNING_BLUEPRINT.md). The implementation intentionally separates learning logic from presentation so the scheduler, content system, speech providers and AI tutor can evolve independently.
+The learning design is documented in [`docs/LEARNING_BLUEPRINT.md`](docs/LEARNING_BLUEPRINT.md). The September 2026 evidence refresh is in [`docs/METHODOLOGY_AUDIT_2026.md`](docs/METHODOLOGY_AUDIT_2026.md).
 
 ## Approved UI directions
 
@@ -24,14 +24,17 @@ Phone is the primary learning device; desktop uses the same product model with a
 - React + TypeScript + Vite
 - mobile-first responsive app shell
 - Today / Learn / Practice / Progress / Profile
-- working retrieval study session
+- first-run goal/time/level onboarding
+- working retrieval-before-reveal study sessions
+- separate new-material and due-review queues
+- goal-aware ordering of unseen material
 - words, chunks/collocations and irregular verbs
-- local review history and memory states
-- adaptive due-date prototype behind a scheduler abstraction
-- browser text-to-speech
-- local persistence
-- PWA manifest + basic offline shell
-- GitHub Actions CI
+- `ts-fsrs` 5.4.2 scheduling with persisted card state
+- evidence-only progress counters and real practice streaks
+- browser text-to-speech after answer reveal
+- versioned local persistence
+- PWA manifest + offline shell
+- GitHub Actions typecheck + production build
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for technical boundaries and next steps.
 
