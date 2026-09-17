@@ -1,5 +1,5 @@
 import { learningItems } from '../data/seed'
-import type { ItemKind,LearningTool } from '../types'
+import type { AppTool,ItemKind,LearningTool } from '../types'
 
 type Availability=Record<ItemKind,number>
 const groups:Array<{kind:ItemKind;title:string;description:string;icon:string}>=[
@@ -14,7 +14,7 @@ const tools:Array<{id:LearningTool;title:string;description:string;icon:string}>
   {id:'active',title:'Активный словарь',description:'От «узнаю» до подтверждённого использования, а не один счётчик',icon:'A'},
 ]
 
-export function Learn({availability,onStartKind,onOpenTool}:{availability:Availability;onStartKind:(kind:ItemKind)=>void;onOpenTool:(tool:LearningTool)=>void}){
+export function Learn({availability,onStartKind,onOpenTool}:{availability:Availability;onStartKind:(kind:ItemKind)=>void;onOpenTool:(tool:AppTool)=>void}){
   return <div className="page generic-page">
     <p className="eyebrow">BUILD THE LANGUAGE GRAPH</p><h1>Учить</h1>
     <p className="page-lead">Связывай форму, смысл, звук, контекст и реальное использование. Карточки — только один из слоёв.</p>
