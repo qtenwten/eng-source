@@ -11,15 +11,15 @@ export function Today({learner,stats,dueCount,newCount,availability,onStart,onOp
   const denominator=Math.max(1,stats.reviewedToday+remaining)
   const progress=Math.min(100,Math.round(stats.reviewedToday/denominator*100))
   const queueEmpty=!dueCount&&!newCount
-  const status=dueCount>0?`${dueCount} элементов готовы к повторению`:newCount>0?`Повторения закрыты · ${newCount} новых элементов ждут знакомства`:'Демо-набор пройден · следующие повторения появятся по FSRS'
+  const status=dueCount>0?`${dueCount} элементов готовы к повторению`:newCount>0?`Повторения закрыты · ${newCount} новых элементов ждут знакомства`:'Карточки закрыты. Переключись на input или output — чтение, listening или speaking.'
   return <div className="page today-page">
-    <section className="welcome-row"><div><p className="eyebrow">{weekday} · YOUR ENGLISH</p><h1>Привет, {learner.name}! <span className="sun">✦</span></h1><p className="muted">Сегодня достаточно одного хорошего занятия.</p></div><div className="streak-pill"><span>🔥</span><strong>{stats.streak}</strong><small>дней</small></div></section>
-    <section className="hero-card"><div className="hero-copy"><span className="hero-kicker">ТВОЙ ПЛАН НА СЕГОДНЯ</span><h2>{dueCount?'Продолжить повторение':'Продолжить обучение'}</h2><p>{status}</p><div className="progress-track" aria-label={`Сегодня выполнено ${progress}%`}><span style={{width:`${progress}%`}} /></div><button className="primary-button" onClick={onStart} disabled={queueEmpty}>{queueEmpty?'На сегодня очередь пуста':'Начать сессию'} {!queueEmpty&&<span>→</span>}</button></div><div className="hero-visual" aria-hidden="true"><div className="landscape"><span className="moon"/><span className="mountain mountain-a"/><span className="mountain mountain-b"/><span className="path"/></div><blockquote>Small steps.<br/>Real fluency.</blockquote></div></section>
+    <section className="welcome-row"><div><p className="eyebrow">{weekday} · YOUR ENGLISH</p><h1>Привет, {learner.name}! <span className="sun">✦</span></h1><p className="muted">Сегодня достаточно одного хорошего занятия — но язык лучше растёт из разных типов практики.</p></div><div className="streak-pill"><span>🔥</span><strong>{stats.streak}</strong><small>дней</small></div></section>
+    <section className="hero-card"><div className="hero-copy"><span className="hero-kicker">ТВОЙ ПЛАН НА СЕГОДНЯ</span><h2>{dueCount?'Продолжить повторение':newCount?'Продолжить обучение':'Перейти к живому языку'}</h2><p>{status}</p><div className="progress-track" aria-label={`Сегодня выполнено ${progress}%`}><span style={{width:`${progress}%`}} /></div><button className="primary-button" onClick={onStart} disabled={queueEmpty}>{queueEmpty?'FSRS-очередь пуста':'Начать сессию'} {!queueEmpty&&<span>→</span>}</button></div><div className="hero-visual" aria-hidden="true"><div className="landscape"><span className="moon"/><span className="mountain mountain-a"/><span className="mountain mountain-b"/><span className="path"/></div><blockquote>Small steps.<br/>Real fluency.</blockquote></div></section>
     <section className="section-block"><div className="section-heading"><div><p className="eyebrow">BALANCED PRACTICE</p><h2>Сегодняшний план</h2></div><button className="text-button" onClick={()=>onOpenModule('settings')}>Настроить</button></div><div className="plan-grid">{todayPlan.map(item=>{
       const available=isPlanAvailable(item.id,dueCount,newCount,availability)
       return <button key={item.id} className={`plan-card tone-${item.tone}`} disabled={!available} aria-disabled={!available} onClick={()=>available&&onOpenModule(item.id)}><span className="plan-icon">{item.icon}</span><strong>{item.title}</strong><small>{planSubtitle(item.id,item.subtitle,dueCount,newCount,availability)}</small></button>
     })}</div></section>
-    <section className="section-block stats-block"><div className="section-heading"><div><p className="eyebrow">WHAT IS ACTUALLY STICKING</p><h2>Твой язык</h2></div><span className="level-chip">{learner.level}</span></div><div className="stats-grid"><Stat number={String(stats.studied)} label="Изучено элементов"/><Stat number={String(stats.strong)} label="Уверенно вспоминаются"/><Stat number={String(stats.irregularKnown)} label="Глаголы уверенно"/><Stat number={String(stats.expressions)} label="Выражения встречались"/></div></section>
+    <section className="section-block stats-block"><div className="section-heading"><div><p className="eyebrow">WHAT IS ACTUALLY STICKING</p><h2>Твой язык</h2></div><span className="level-chip">{learner.level}</span></div><div className="stats-grid"><Stat number={String(stats.studied)} label="Изучено элементов"/><Stat number={String(stats.strong)} label="Уверенно вспоминаются"/><Stat number={String(stats.active)} label="Дошли до active"/><Stat number={String(stats.errorsDue)} label="Ошибок к повторению"/></div></section>
   </div>
 }
 
@@ -28,6 +28,7 @@ function isPlanAvailable(id:string,dueCount:number,newCount:number,availability:
   if(id==='new')return newCount>0
   if(id==='chunks')return availability.chunk>0
   if(id==='verbs')return availability.irregular>0
+  if(id==='listening'||id==='speaking')return true
   return false
 }
 function planSubtitle(id:string,fallback:string,dueCount:number,newCount:number,availability:Availability){
@@ -35,7 +36,8 @@ function planSubtitle(id:string,fallback:string,dueCount:number,newCount:number,
   if(id==='new')return newCount?`${Math.min(newCount,5)} в ближайшей сессии`:'всё изучено'
   if(id==='chunks')return availability.chunk?`${availability.chunk} сейчас`:'нет назначенных'
   if(id==='verbs')return availability.irregular?`${availability.irregular} сейчас`:'нет назначенных'
-  if(id==='listening'||id==='speaking')return'в разработке'
+  if(id==='listening')return'аудио → transcript после попытки'
+  if(id==='speaking')return'spaced speaking / writing'
   return fallback
 }
 function Stat({number,label}:{number:string;label:string}){return <div className="stat-card"><strong>{number}</strong><span>{label}</span></div>}
