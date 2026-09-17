@@ -60,25 +60,27 @@ function upsertErrors(current:LearnerError[],incoming:Array<Omit<LearnerError,'i
 
 export function useLearner(){
   const[state,setState]=useState<LearnerState>(()=>loadLearner())
+  const[clock,setClock]=useState(()=>Date.now())
   useEffect(()=>{saveLearner(state)},[state])
+  useEffect(()=>{const id=window.setInterval(()=>setClock(Date.now()),30_000);return()=>window.clearInterval(id)},[])
 
   const allItems=useMemo(()=>[...learningItems,...state.inbox.map(inboxAsLearningItem)],[state.inbox])
-  const dueItems=useMemo(()=>allItems.filter(item=>isDue(state.memory[item.id])),[allItems,state.memory])
+  const dueItems=useMemo(()=>allItems.filter(item=>isDue(state.memory[item.id],clock)),[allItems,state.memory,clock])
   const newItems=useMemo(()=>allItems.filter(item=>!state.memory[item.id]).sort((a,b)=>itemPriority(b,state.goal,state.level)-itemPriority(a,state.goal,state.level)),[allItems,state.memory,state.goal,state.level])
   const stats=useMemo<LearningStats>(()=>{
     const studied=allItems.filter(item=>state.memory[item.id])
-    const strongItems=studied.filter(item=>{const memory=state.memory[item.id];return memory&&!isDue(memory)&&(memory.lastRating==='good'||memory.lastRating==='easy')&&memory.stability>=1})
+    const strongItems=studied.filter(item=>{const memory=state.memory[item.id];return memory&&!isDue(memory,clock)&&(memory.lastRating==='good'||memory.lastRating==='easy')&&memory.stability>=1})
     const activeItems=studied.filter(item=>masteryStage(state.memory[item.id],countProductiveUses(item.answer,state.productiveAttempts))==='active')
-    const today=localDayKey(Date.now())
+    const today=localDayKey(clock)
     return {
       studied:studied.length,strong:strongItems.length,active:activeItems.length,
       expressions:studied.filter(item=>item.kind==='chunk').length,
       irregularKnown:strongItems.filter(item=>item.kind==='irregular').length,
       reviewedToday:state.reviewLog.filter(event=>localDayKey(event.reviewedAt)===today).length,
-      streak:calculateStreak(state.reviewLog,state.activityLog),
-      errorsDue:state.errors.filter(error=>error.nextPracticeAt<=Date.now()).length,
+      streak:calculateStreak(state.reviewLog,state.activityLog,clock),
+      errorsDue:state.errors.filter(error=>error.nextPracticeAt<=clock).length,
     }
-  },[allItems,state.memory,state.reviewLog,state.errors,state.productiveAttempts,state.activityLog])
+  },[allItems,state.memory,state.reviewLog,state.errors,state.productiveAttempts,state.activityLog,clock])
 
   const setThemeStyle=(themeStyle:ThemeStyle)=>setState(current=>({...current,themeStyle}))
   const setColorMode=(colorMode:ColorMode)=>setState(current=>({...current,colorMode}))
@@ -91,6 +93,7 @@ export function useLearner(){
       const next=reviewMemory(previous,itemId,rating,now)
       return {...current,memory:{...current.memory,[itemId]:next},reviewLog:[...current.reviewLog,{id:`${itemId}:${now}`,itemId,rating,reviewedAt:now,previousDueAt:previous?.dueAt??now,nextDueAt:next.dueAt}].slice(-2000)}
     })
+    setClock(now)
   }
   const addInbox=(text:string,translation:string,context:string)=>{
     const clean=text.trim();if(!clean)return
@@ -105,13 +108,13 @@ export function useLearner(){
   }
   const addManualError=(incorrect:string,correct:string,explanation:string)=>{
     if(!incorrect.trim()||!correct.trim())return
-    const now=Date.now();setState(current=>({...current,errors:upsertErrors(current.errors,[{incorrect:incorrect.trim(),correct:correct.trim(),explanation:explanation.trim()||'Исправь форму и затем используй её в новом контексте.',source:'manual'}],now)}))
+    const now=Date.now();setState(current=>({...current,errors:upsertErrors(current.errors,[{incorrect:incorrect.trim(),correct:correct.trim(),explanation:explanation.trim()||'Исправь форму и затем используй её в новом контексте.',source:'manual'}],now)}));setClock(now)
   }
   const practiceError=(id:string,success:boolean)=>{const now=Date.now();setState(current=>({...current,errors:current.errors.map(error=>{
     if(error.id!==id||error.nextPracticeAt>now)return error
     return{...error,resolvedCount:error.resolvedCount+(success?1:0),lastSeenAt:now,nextPracticeAt:success?nextTaskDue(Math.min(14,2+error.resolvedCount*2),now):now+10*60*1000}
-  })}))}
-  const recordActivity=(kind:ActivityKind,durationMinutes:number)=>{const now=Date.now();setState(current=>({...current,activityLog:[...current.activityLog,{id:`${kind}:${now}`,kind,durationMinutes:Math.max(1,Math.min(120,Math.round(durationMinutes))),completedAt:now}].slice(-1000)}))}
+  })}));setClock(now)}
+  const recordActivity=(kind:ActivityKind,durationMinutes:number)=>{const now=Date.now();setState(current=>({...current,activityLog:[...current.activityLog,{id:`${kind}:${now}`,kind,durationMinutes:Math.max(1,Math.min(120,Math.round(durationMinutes))),completedAt:now}].slice(-1000)}));setClock(now)}
   const recordProduction=(taskId:string,mode:ProductiveMode,response:string,targets:string[],repeatAfterDays:number,durationMinutes=1)=>{
     const now=Date.now(),analysis=analyzeProduction(response,targets,mode),usedTargets=targets.filter(target=>targetUsed(response,target)),targetHits=usedTargets.length,safeDuration=Math.max(1,Math.min(120,Math.round(durationMinutes)))
     setState(current=>{
@@ -123,9 +126,10 @@ export function useLearner(){
         activityLog:[...current.activityLog,{id:`${mode}:${now}`,kind:mode,durationMinutes:safeDuration,completedAt:now}].slice(-1000),
       }
     })
+    setClock(now)
     return analysis
   }
-  const resetProgress=()=>setState(current=>({...current,memory:{},reviewLog:[],errors:[],productiveAttempts:[],activityLog:[]}))
+  const resetProgress=()=>{const now=Date.now();setState(current=>({...current,memory:{},reviewLog:[],errors:[],productiveAttempts:[],activityLog:[]}));setClock(now)}
 
   return {state,allItems,dueItems,newItems,stats,setThemeStyle,setColorMode,completeOnboarding,updateLearningPreferences,rateItem,addInbox,addManualError,practiceError,recordActivity,recordProduction,resetProgress}
 }
