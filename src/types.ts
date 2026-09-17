@@ -9,7 +9,20 @@ export type ProductiveMode = 'speaking' | 'writing'
 export type ActivityKind = 'reading' | 'listening' | 'speaking' | 'writing'
 export type MasteryStage = 'unseen' | 'recognition' | 'recall' | 'context' | 'active'
 
-export interface LearningItem { id: string; kind: ItemKind; prompt: string; answer: string; translation: string; example: string; note?: string; tags: string[] }
+export interface IrregularForms { base: string; past: string; participle: string }
+export interface LearningItem {
+  id: string
+  kind: ItemKind
+  prompt: string
+  answer: string
+  translation: string
+  example: string
+  /** Built-in content should provide this; personal Inbox context may not have a full-sentence translation yet. */
+  exampleTranslation?: string
+  irregularForms?: IrregularForms
+  note?: string
+  tags: string[]
+}
 export interface MemoryState {
   itemId: string
   dueAt: number
