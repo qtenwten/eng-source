@@ -14,31 +14,49 @@ import { Onboarding } from './components/Onboarding'
 import type { ItemKind,NavSection } from './types'
 import './styles.css'
 
+type SessionKind=ItemKind|'due'|'new'
+
 export default function App(){
-  const{state,dueItems,setThemeStyle,setColorMode,completeOnboarding,rateItem,resetProgress}=useLearner()
+  const{state,dueItems,newItems,stats,setThemeStyle,setColorMode,completeOnboarding,rateItem,resetProgress}=useLearner()
   const[section,setSection]=useState<NavSection>('today')
-  const[sessionKind,setSessionKind]=useState<ItemKind|'due'|null>(null)
+  const[sessionKind,setSessionKind]=useState<SessionKind|null>(null)
   const[systemTick,setSystemTick]=useState(0)
+
   useEffect(()=>{const media=window.matchMedia('(prefers-color-scheme: dark)');const handler=()=>setSystemTick(value=>value+1);media.addEventListener?.('change',handler);return()=>media.removeEventListener?.('change',handler)},[])
   const resolvedMode=useMemo(()=>resolveColorMode(state.colorMode),[state.colorMode,systemTick])
-  const sessionItems=useMemo(()=>{if(!sessionKind)return[];if(sessionKind==='due')return dueItems.length?dueItems:learningItems.slice(0,5);return learningItems.filter(item=>item.kind===sessionKind)},[sessionKind,dueItems])
+  const sessionItems=useMemo(()=>{
+    if(!sessionKind)return[]
+    if(sessionKind==='due')return dueItems
+    if(sessionKind==='new')return newItems
+    return learningItems.filter(item=>item.kind===sessionKind)
+  },[sessionKind,dueItems,newItems])
+  const startPrimary=()=>setSessionKind(dueItems.length?'due':'new')
 
   if(!state.onboardingComplete)return <div className={`app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
+
+  const openModule=(module:string)=>{
+    if(module==='verbs')setSessionKind('irregular')
+    else if(module==='chunks')setSessionKind('chunk')
+    else if(module==='review')setSessionKind('due')
+    else if(module==='new')setSessionKind('new')
+    else if(module==='settings')setSection('profile')
+    else setSection('practice')
+  }
 
   return <div className={`app theme-${state.themeStyle} mode-${resolvedMode}`}>
     <aside className="desktop-sidebar">
       <div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div>
       <p className="brand-tagline">English that stays.</p>
       <Sidebar section={section} onChange={setSection}/>
-      <div className="sidebar-bottom"><ThemeControls themeStyle={state.themeStyle} colorMode={state.colorMode} onThemeStyle={setThemeStyle} onColorMode={setColorMode}/><div className="mini-profile"><span>{state.name.slice(0,1).toUpperCase()}</span><div><strong>{state.name}</strong><small>{state.level} · 🔥 {state.streak}</small></div></div></div>
+      <div className="sidebar-bottom"><ThemeControls themeStyle={state.themeStyle} colorMode={state.colorMode} onThemeStyle={setThemeStyle} onColorMode={setColorMode}/><div className="mini-profile"><span>{state.name.slice(0,1).toUpperCase()}</span><div><strong>{state.name}</strong><small>{state.level} · 🔥 {stats.streak}</small></div></div></div>
     </aside>
     <main className="main-content">
       <header className="mobile-topbar"><div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div><span className="level-chip">{state.level}</span></header>
-      {section==='today'&&<Today learner={state} dueCount={dueItems.length} onStart={()=>setSessionKind('due')} onOpenModule={module=>{if(module==='verbs')setSessionKind('irregular');else if(module==='chunks')setSessionKind('chunk');else if(module==='review'||module==='new')setSessionKind('due');else setSection('practice')}}/>}
+      {section==='today'&&<Today learner={state} stats={stats} dueCount={dueItems.length} newCount={newItems.length} onStart={startPrimary} onOpenModule={openModule}/>} 
       {section==='learn'&&<Learn onStartKind={setSessionKind}/>} 
-      {section==='practice'&&<Practice dueCount={dueItems.length} onStart={()=>setSessionKind('due')}/>} 
-      {section==='progress'&&<Progress learner={state}/>} 
-      {section==='profile'&&<Profile learner={state} onThemeStyle={setThemeStyle} onColorMode={setColorMode} onReset={resetProgress}/>} 
+      {section==='practice'&&<Practice dueCount={dueItems.length} newCount={newItems.length} onStart={startPrimary}/>} 
+      {section==='progress'&&<Progress learner={state} stats={stats}/>} 
+      {section==='profile'&&<Profile learner={state} stats={stats} onThemeStyle={setThemeStyle} onColorMode={setColorMode} onReset={resetProgress}/>} 
     </main>
     <BottomNav current={section} onChange={setSection}/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
