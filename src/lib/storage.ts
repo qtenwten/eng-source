@@ -45,5 +45,9 @@ export function loadLearner(): LearnerState {
 }
 
 export function saveLearner(state: LearnerState) {
-  localStorage.setItem(KEY,JSON.stringify(state))
+  try {
+    localStorage.setItem(KEY,JSON.stringify(state))
+  } catch {
+    // The learning session should keep working even if private mode/quota blocks persistence.
+  }
 }
