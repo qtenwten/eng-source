@@ -6,13 +6,14 @@ interface Props{items:LearningItem[];memory:Record<string,MemoryState>;onRate:(i
 const labels:Record<ReviewRating,{title:string;hint:string}>={again:{title:'Ещё раз',hint:'Не вспомнил'},hard:{title:'Трудно',hint:'Еле вспомнил'},good:{title:'Хорошо',hint:'Вспомнил'},easy:{title:'Легко',hint:'Автоматически'}}
 
 export function StudySession({items,memory,onRate,onClose}:Props){
+  // Freeze the queue at session start. Parent memory updates must not reorder/remove items mid-session.
+  const[queue]=useState(()=>items.slice())
   const[index,setIndex]=useState(0)
   const[revealed,setRevealed]=useState(false)
   const[finished,setFinished]=useState(false)
-  const queue=items.slice(0,7)
 
   if(!queue.length)return <div className="study-overlay" role="dialog" aria-modal="true"><div className="study-sheet finish-card"><div className="success-orbit">✓</div><p className="eyebrow">ALL CLEAR</p><h2>Сейчас ничего не назначено.</h2><p>Повторения появятся по расписанию. Можно выбрать отдельный модуль в разделе «Учить».</p><button className="primary-button" onClick={onClose}>Вернуться</button></div></div>
-  if(finished)return <div className="study-overlay" role="dialog" aria-modal="true"><div className="study-sheet finish-card"><div className="success-orbit">✓</div><p className="eyebrow">SESSION COMPLETE</p><h2>Не просто посмотрел — вспомнил.</h2><p>Ответы уже повлияли на будущие интервалы FSRS. Следующая сессия будет собрана по новой памяти.</p><button className="primary-button" onClick={onClose}>Вернуться на главную</button></div></div>
+  if(finished)return <div className="study-overlay" role="dialog" aria-modal="true"><div className="study-sheet finish-card"><div className="success-orbit">✓</div><p className="eyebrow">SESSION COMPLETE</p><h2>Сессия завершена.</h2><p>Каждая оценка уже повлияла на будущий интервал FSRS. Даже «Ещё раз» — полезный сигнал памяти, а не неудача.</p><button className="primary-button" onClick={onClose}>Вернуться на главную</button></div></div>
 
   const item=queue[index]
   const currentMemory=memory[item.id]
