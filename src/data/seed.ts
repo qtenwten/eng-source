@@ -1,8 +1,20 @@
 import { coreLexicon } from './coreLexicon'
 import { extendedLexicon } from './extendedLexicon'
+import { lexiconA1 } from './lexiconA1'
+import { lexiconA2 } from './lexiconA2'
+import { lexiconB1 } from './lexiconB1'
+import { lexiconB2 } from './lexiconB2'
 import { irregularVerbItems } from './irregularVerbs'
 
-export const learningItems = [...coreLexicon,...extendedLexicon,...irregularVerbItems]
+export const learningItems = [
+  ...coreLexicon,
+  ...extendedLexicon,
+  ...lexiconA1,
+  ...lexiconA2,
+  ...lexiconB1,
+  ...lexiconB2,
+  ...irregularVerbItems,
+]
 
 export const todayPlan = [
   {id:'new',icon:'✦',title:'Новое',subtitle:'адаптивная очередь',tone:'blue'},
