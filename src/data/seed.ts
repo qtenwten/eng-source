@@ -1,7 +1,8 @@
 import { coreLexicon } from './coreLexicon'
+import { extendedLexicon } from './extendedLexicon'
 import { irregularVerbItems } from './irregularVerbs'
 
-export const learningItems = [...coreLexicon,...irregularVerbItems]
+export const learningItems = [...coreLexicon,...extendedLexicon,...irregularVerbItems]
 
 export const todayPlan = [
   {id:'new',icon:'✦',title:'Новое',subtitle:'адаптивная очередь',tone:'blue'},
