@@ -167,7 +167,7 @@ const rows:readonly LexiconRow[] = [
 ["currently","в настоящее время","The feature is currently available on mobile only.","Сейчас эта функция доступна только на мобильных устройствах.","word",["time"]],
 ["seriously","серьёзно","You should take this warning seriously.","К этому предупреждению стоит отнестись серьёзно.","word",["adverb"]],
 ["simply","просто","I simply don't have enough time.","У меня просто недостаточно времени.","word",["adverb"]],
-["actually,","вообще-то; на самом деле","Actually, I changed my mind.","Вообще-то, я передумал.","chunk",["conversation"]],
+["as it happens","как оказалось; кстати","As it happens, I know someone who can help.","Как оказалось, я знаю человека, который может помочь.","chunk",["conversation"]],
 ["as long as","при условии что; пока","You can stay as long as you like.","Ты можешь остаться столько, сколько хочешь.","chunk",["grammar"]],
 ["as soon as","как только","Call me as soon as you arrive.","Позвони мне, как только приедешь.","chunk",["grammar"]],
 ["at the same time","в то же время","The job is difficult but interesting at the same time.","Работа сложная, но в то же время интересная.","chunk",["conversation"]],
