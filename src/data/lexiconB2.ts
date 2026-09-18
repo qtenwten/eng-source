@@ -134,7 +134,7 @@ const rows:readonly LexiconRow[] = [
 ["it is worth noting that","стоит отметить, что","It is worth noting that the sample was quite small.","Стоит отметить, что выборка была довольно небольшой.","chunk",["discourse"]],
 ["on the whole","в целом","On the whole, the update was successful.","В целом обновление прошло успешно.","chunk",["discourse"]],
 ["provided that","при условии что","The plan will work provided that everyone follows the schedule.","План сработает при условии, что все будут соблюдать расписание.","chunk",["grammar"]],
-["rather than","а не; вместо того чтобы","Focus on useful phrases rather than isolated rare words.","Сосредоточься на полезных фразах, а не на редких отдельных словах.","chunk",["discourse"]],
+["in comparison with","по сравнению с","In comparison with the old version, this one is much faster.","По сравнению со старой версией эта работает намного быстрее.","chunk",["discourse"]],
 ["with regard to","что касается","With regard to pronunciation, we need better audio support.","Что касается произношения, нам нужна более качественная аудиоподдержка.","chunk",["work"]],
 ["to a large extent","в значительной степени","Success depends to a large extent on regular practice.","Успех в значительной степени зависит от регулярной практики.","chunk",["discourse"]],
 ["take into consideration","принимать во внимание","We need to take mobile users into consideration.","Нам нужно учитывать пользователей мобильных устройств.","chunk",["work"]],
