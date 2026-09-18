@@ -94,7 +94,7 @@ const rows:readonly LexiconRow[] = [
 ["passenger","пассажир","All passengers must show their tickets.","Все пассажиры должны показать билеты.","word",["travel"]],
 ["password","пароль","I forgot my password again.","Я снова забыл пароль.","word",["technology"]],
 ["path","тропа; путь","Follow this path to the lake.","Иди по этой тропе к озеру.","word",["travel"]],
-["patient","пациент","The doctor is speaking to a patient.","Врач разговаривает с пациентом.","word",["health"]],
+["polite","вежливый","The receptionist was polite and helpful.","Администратор был вежливым и отзывчивым.","word",["people"]],
 ["payment","оплата","Your payment was successful.","Оплата прошла успешно.","word",["shopping"]],
 ["plan","план","We need a plan for tomorrow.","Нам нужен план на завтра.","word",["work"]],
 ["platform","платформа; перрон","The train leaves from platform six.","Поезд отправляется с шестого пути.","word",["travel"]],
