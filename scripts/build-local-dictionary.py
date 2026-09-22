@@ -13,7 +13,6 @@ same origin as sENG. External translation remains only a last-resort fallback.
 from __future__ import annotations
 
 import json
-import os
 import re
 import sqlite3
 import sys
@@ -191,15 +190,14 @@ def build_shards(database: Path, last_modified: str | None, source_size: int) ->
     )
 
     notice.write_text(
-        """sENG local English–Russian dictionary\n\n"
+        "sENG local English–Russian dictionary\n\n"
         "Dictionary data: WikDict / Wiktionary via DBnary\n"
         "Source: https://www.wikdict.com/ and "
         "https://download.wikdict.com/dictionaries/sqlite/2/en-ru.sqlite3\n"
         "License: Creative Commons Attribution-ShareAlike (CC BY-SA)\n"
         "https://creativecommons.org/licenses/by-sa/3.0/\n\n"
         "The dictionary data files in this directory are redistributed under "
-        "the source data license. Application code remains separately licensed.\n"
-        """,
+        "the source data license. Application code remains separately licensed.\n",
         encoding="utf-8",
     )
 
