@@ -96,9 +96,9 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   return <div className="classic-reading">
     <section className="reading-intro">
       <div>
-        <p className="eyebrow">GRADED CLASSICS · 10 BOOKS · 100 PARTS</p>
+        <p className="eyebrow">GRADED CLASSICS · IMMERSIVE READING</p>
         <h2>Классика для погружения</h2>
-        <p>По умолчанию открывается длинный режим: все 10 частей выбранного уровня идут подряд одним чтением. Если захочется спокойно разобрать конкретную сцену — переключись на «Одна часть».</p>
+        <p>По умолчанию открывается полноценная длинная адаптация выбранной классики: несколько больших абзацев, 8–20 минут непрерывного чтения и живой словарь. Короткие сцены оставлены отдельно для спокойного разбора.</p>
       </div>
       <div className="reading-summary"><strong>{completed.size}/100</strong><span>частей прочитано</span></div>
     </section>
@@ -121,15 +121,15 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
 
     <div className="reading-viewbar">
       <div className="view-tabs">
-        <button className={view==='immersive'?'active':''} onClick={()=>setViewAndStore('immersive')}>Погружение · все 10 частей</button>
-        <button className={view==='part'?'active':''} onClick={()=>setViewAndStore('part')}>Одна часть</button>
+        <button className={view==='immersive'?'active':''} onClick={()=>setViewAndStore('immersive')}>Большое чтение</button>
+        <button className={view==='part'?'active':''} onClick={()=>setViewAndStore('part')}>Короткая сцена</button>
       </div>
       <div className="reading-metrics"><span>{wordCount.toLocaleString('ru-RU')} слов</span><span>≈ {readingMinutes} мин</span></div>
     </div>
 
     <div className={lookup?'reading-layout dictionary-open':'reading-layout'}>
       <aside className="reading-list" aria-label="Части этого уровня">
-        <div className="reading-list-head"><strong>Части</strong><span>{gradeDone}/10</span></div>
+        <div className="reading-list-head"><strong>Сцены</strong><span>{gradeDone}/10</span></div>
         {entries.map((item,index)=><button key={item.id} className={view==='part'&&item.id===entry.id?'active':''} onClick={()=>chooseEntry(item.id)}>
           <span className={completed.has(item.id)?'reading-number done':'reading-number'}>{completed.has(item.id)?'✓':index+1}</span>
           <span><strong>{item.title}</strong><small>{countWords(item.text)} слов · ≈ {estimateLearnerMinutes(item.text)} мин</small></span>
@@ -139,7 +139,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
       <article className="classic-reader">
         <header className="reader-head">
           <div>
-            <p className="eyebrow">{view==='immersive'?'LONGFORM ADAPTATION':entry.country+' · '+entry.work}</p>
+            <p className="eyebrow">{view==='immersive'?'IMMERSIVE ADAPTATION':entry.country+' · '+entry.work}</p>
             <h2>{view==='immersive'?longform.title:entry.title}</h2>
             <p>{entry.author} · учебная адаптация sENG · {wordCount.toLocaleString('ru-RU')} слов · ≈ {readingMinutes} мин</p>
           </div>
@@ -171,10 +171,10 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
 
         <footer className="reader-finish">
           <p>{view==='immersive'
-            ? gradeDone===10?'✓ Весь уровень уже отмечен прочитанным.':'Длинный режим засчитает все 10 частей. Можно читать без перевода, а русский включать только когда смысл действительно потерялся.'
+            ? gradeDone===10?'✓ Весь уровень уже отмечен прочитанным.':'Большое чтение засчитает этот уровень целиком. Лучше начать без русского и включать перевод только там, где действительно теряется смысл.'
             : completed.has(entry.id)?'✓ Эта часть уже засчитана.':'Отметь часть после настоящего чтения, а не после быстрого просмотра.'}</p>
           <button className="primary-action" disabled={view==='immersive'?gradeDone===10:completed.has(entry.id)} onClick={markDone}>
-            {view==='immersive'?(gradeDone===10?'Уровень прочитан ✓':'Отметить все 10 частей'):(completed.has(entry.id)?'Прочитано ✓':'Отметить прочитанным')}
+            {view==='immersive'?(gradeDone===10?'Уровень прочитан ✓':'Отметить большое чтение'):(completed.has(entry.id)?'Прочитано ✓':'Отметить прочитанным')}
           </button>
         </footer>
       </article>
