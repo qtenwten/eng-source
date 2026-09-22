@@ -1,5 +1,6 @@
 import { useMemo,useState } from 'react'
-import { listeningClips,productiveTasks,readingTexts } from '../data/productivity'
+import { listeningClips,productiveTasks } from '../data/productivity'
+import { ClassicReading } from './ClassicReading'
 import { countProductiveUses,masteryLabels,masteryStage } from '../lib/productivity'
 import type { ActivityKind,LearnerState,LearningItem,LearningTool,ProductiveMode } from '../types'
 
@@ -22,7 +23,7 @@ export function LearningTools(props:Props){
 function renderTool(props:Props){
   switch(props.tool){
     case'inbox':return <Inbox learner={props.learner} onAdd={props.onAddInbox}/>
-    case'reading':return <Reading onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
+    case'reading':return <ClassicReading level={props.learner.level} allItems={props.allItems} onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
     case'listening':return <Listening onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
     case'errors':return <Errors learner={props.learner} onAdd={props.onAddError} onPractice={props.onPracticeError}/>
     case'production':return <Production learner={props.learner} allItems={props.allItems} onRecord={props.onRecordProduction}/>
@@ -37,13 +38,6 @@ function Inbox({learner,onAdd}:{learner:LearnerState;onAdd:Props['onAddInbox']})
   const canSubmit=Boolean(text.trim()&&(translation.trim()||context.trim()))
   const submit=(event:React.FormEvent)=>{event.preventDefault();if(!canSubmit)return;onAdd(text,translation,context);setText('');setTranslation('');setContext('')}
   return <><p className="tool-lead">Сохраняй выражение вместе со смыслом или исходным контекстом. Без понятной подсказки активное вспоминание превращается в угадывание, поэтому одного слова без контекста недостаточно.</p><form className="tool-form" onSubmit={submit}><label>Английское слово или фраза<input value={text} onChange={e=>setText(e.target.value)} placeholder="get away with it"/></label><label>Перевод / смысл<input value={translation} onChange={e=>setTranslation(e.target.value)} placeholder="выйти сухим из воды"/></label><label>Где встретилось<textarea value={context} onChange={e=>setContext(e.target.value)} placeholder="He thought he could get away with it."/></label><button className="primary-action" disabled={!canSubmit}>Добавить в обучение</button></form><div className="saved-list">{learner.inbox.slice().reverse().map(item=><article className="saved-item" key={item.id}><strong>{item.text}</strong><span>{item.translation||'Подсказка берётся из контекста'}</span>{item.context&&<small>“{item.context}”</small>}</article>)}{!learner.inbox.length&&<Empty text="Пока пусто. Добавь первую фразу из своей реальной жизни."/>}</div></>
-}
-
-function Reading({onSave,onActivity}:{onSave:Props['onAddInbox'];onActivity:Props['onRecordActivity']}){
-  const[index,setIndex]=useState(0),[done,setDone]=useState(false);const text=readingTexts[index]
-  const switchText=(i:number)=>{setIndex(i);setDone(false)}
-  const finish=()=>{if(!done){onActivity('reading',text.minutes);setDone(true)}}
-  return <><div className="tool-switch">{readingTexts.map((item,i)=><button key={item.id} className={i===index?'active':''} onClick={()=>switchText(i)}>{item.cefr} · {item.minutes} мин</button>)}</div><article className="reading-card"><p className="eyebrow">MEANING-FOCUSED READING · {text.cefr}</p><h2>{text.title}</h2><p className="tool-lead">Первый проход — ради общего смысла. Не останавливайся на каждом незнакомом слове.</p><p className="reading-text">{text.text}</p>{!done?<button className="primary-action" onClick={finish}>Прочитал ради смысла</button>:<><div className="feedback-box"><p>✓ Чтение записано. Теперь можно разобрать несколько полезных выражений — уже после первого смыслового прохода.</p></div><div className="target-list">{text.targets.map(target=><button key={target[0]} onClick={()=>onSave(target[0],target[1],contextForTarget(text.text,target[0]))}><strong>{target[0]}</strong><span>{target[1]}</span><small>＋ в Inbox</small></button>)}</div></>}</article></>
 }
 
 function Listening({onSave,onActivity}:{onSave:Props['onAddInbox'];onActivity:Props['onRecordActivity']}){
@@ -96,7 +90,6 @@ function ActiveVocabulary({learner,allItems}:{learner:LearnerState;allItems:Lear
 }
 
 function targetGloss(target:string,items:LearningItem[]){const needle=target.toLowerCase().trim();return items.find(item=>item.answer.toLowerCase().trim()===needle)?.translation??''}
-function contextForTarget(text:string,target:string){return text.split(/(?<=[.!?])\s+/).find(sentence=>sentence.toLowerCase().includes(target.toLowerCase()))??text}
 function formatDue(timestamp:number){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(timestamp))}
 function Empty({text}:{text:string}){return <div className="empty-tool"><span>◎</span><p>{text}</p></div>}
 function speak(text:string){if(!('speechSynthesis'in window))return false;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;window.speechSynthesis.speak(u);return true}
