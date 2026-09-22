@@ -2,6 +2,7 @@ import { useMemo,useState } from 'react'
 import { readingGrades,readingLibrary,readingsForGrade,type ReadingEntry } from '../data/readingLibrary'
 import { commonIrregularBases,readingWordDictionary } from '../data/readingDictionary'
 import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
+import { translateReadingWord } from '../lib/readingTranslation'
 import type { ActivityKind,LearningItem } from '../types'
 
 type TranslationMode='hidden'|'parallel'|'russian'
@@ -19,6 +20,9 @@ type Lookup={
   context:string
   contextTranslation:string
   phrase?:[string,string]
+  loading?:boolean
+  source?:'local'|'online'
+  failed?:boolean
 }
 
 const completedKey='seng-reading-completed-v1'
@@ -82,7 +86,20 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
     if(!term)return
     const found=findTranslation(term,gradeGlossary.singleWords,lexicon)
     const phrase=findPhraseForWord(term,gradeGlossary.phrases)
-    setLookup({term,translation:found.translation,base:found.base,context,contextTranslation,phrase})
+
+    if(found.translation){
+      setLookup({term,translation:found.translation,base:found.base,context,contextTranslation,phrase,source:'local'})
+      return
+    }
+
+    setLookup({term,context,contextTranslation,phrase,loading:true})
+    void translateReadingWord(term).then(translation=>{
+      setLookup(current=>{
+        if(!current||normalize(current.term)!==normalize(term)||current.context!==context)return current
+        if(!translation)return{...current,loading:false,failed:true}
+        return{...current,translation,base:term,loading:false,failed:false,source:'online'}
+      })
+    })
   }
   const openPhrase=(term:string,translation:string,source:ReadingEntry)=>{
     setLookup({term,translation,context:sentenceFor(source.text,term),contextTranslation:pairedSentenceTranslation(source,term)})
@@ -240,12 +257,16 @@ function DictionaryPanel({lookup,saveable,onClose,onSave}:{lookup:Lookup|null;sa
   return <aside className={lookup?'reading-dictionary-panel open':'reading-dictionary-panel'} aria-live="polite">
     {lookup?<div className="dictionary-card">
       <div className="dictionary-top"><div><p className="eyebrow">СЛОВАРЬ В ЧТЕНИИ</p><h3>{lookup.term}</h3></div><button className="word-close" onClick={onClose} aria-label="Закрыть перевод">×</button></div>
-      {lookup.translation?<div className="dictionary-translation"><strong>{lookup.translation}</strong>{lookup.base&&normalize(lookup.base)!==normalize(lookup.term)&&<small>Форма слова → {lookup.base}</small>}</div>
-        : lookup.phrase?<div className="dictionary-translation phrase-hit"><small>В этом тексте слово встречается в выражении</small><strong>{lookup.phrase[0]}</strong><span>{lookup.phrase[1]}</span></div>
-        : <div className="dictionary-translation sentence-fallback"><small>Отдельной словарной статьи пока нет. Ниже всегда есть перевод предложения, чтобы чтение не обрывалось.</small></div>}
+      {lookup.loading
+        ? <div className="dictionary-translation dictionary-loading"><span className="dictionary-spinner" aria-hidden="true"/><div><strong>Ищу перевод…</strong><small>Этого слова нет в локальном словаре — подключаю полный EN → RU поиск.</small></div></div>
+        : lookup.translation
+          ? <div className="dictionary-translation"><strong>{lookup.translation}</strong>{lookup.base&&normalize(lookup.base)!==normalize(lookup.term)&&<small>Форма слова → {lookup.base}</small>}{lookup.source==='online'&&<small>Онлайн-словарь · перевод сохранён в кэш браузера</small>}</div>
+          : lookup.phrase
+            ? <div className="dictionary-translation phrase-hit"><small>Отдельный перевод сейчас недоступен, но слово встречается в выражении</small><strong>{lookup.phrase[0]}</strong><span>{lookup.phrase[1]}</span></div>
+            : <div className="dictionary-translation sentence-fallback"><small>{lookup.failed?'Не удалось обратиться к онлайн-словарю. Перевод предложения ниже всё равно поможет не прерывать чтение.':'Подбираю перевод по контексту.'}</small></div>}
       <div className="context-pair"><span>Контекст</span><p>{lookup.context}</p><span>Перевод предложения</span><p>{lookup.contextTranslation}</p></div>
-      {saveable&&<button className="primary-action" onClick={onSave}>＋ {lookup.translation?'Добавить в обучение':'Сохранить выражение'}</button>}
-    </div>:<div className="dictionary-empty"><span>Aa</span><strong>Нажми на слово</strong><p>Здесь появятся перевод, форма слова и русский контекст. Панель больше не будет прыгать поверх текста.</p></div>}
+      {saveable&&!lookup.loading&&<button className="primary-action" onClick={onSave}>＋ {lookup.translation?'Добавить в обучение':'Сохранить выражение'}</button>}
+    </div>:<div className="dictionary-empty"><span>Aa</span><strong>Нажми на любое слово</strong><p>Сначала используется быстрый локальный словарь, а незнакомые слова автоматически переводятся онлайн и кэшируются.</p></div>}
   </aside>
 }
 
