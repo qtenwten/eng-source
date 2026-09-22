@@ -17,6 +17,7 @@ import re
 import sqlite3
 import sys
 import tempfile
+import time
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -47,28 +48,42 @@ def bucket_for(value: str) -> str:
 
 
 def download_database(target: Path) -> tuple[str | None, int]:
-    request = urllib.request.Request(
-        SOURCE_URL,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/octet-stream"},
-    )
-    print(f"[dictionary] downloading {SOURCE_URL}", flush=True)
-    with urllib.request.urlopen(request, timeout=120) as response:
-        last_modified = response.headers.get("Last-Modified")
-        content_length = response.headers.get("Content-Length")
-        with target.open("wb") as handle:
-            while True:
-                chunk = response.read(1024 * 1024)
-                if not chunk:
-                    break
-                handle.write(chunk)
+    last_error: Exception | None = None
+    for attempt in range(1, 4):
+        try:
+            request = urllib.request.Request(
+                SOURCE_URL,
+                headers={"User-Agent": USER_AGENT, "Accept": "application/octet-stream"},
+            )
+            print(f"[dictionary] downloading {SOURCE_URL} (attempt {attempt}/3)", flush=True)
+            with urllib.request.urlopen(request, timeout=120) as response:
+                last_modified = response.headers.get("Last-Modified")
+                content_length = response.headers.get("Content-Length")
+                with target.open("wb") as handle:
+                    while True:
+                        chunk = response.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        handle.write(chunk)
 
-    size = target.stat().st_size
-    expected = int(content_length) if content_length and content_length.isdigit() else None
-    if expected is not None and size != expected:
-        raise RuntimeError(f"Dictionary download incomplete: expected {expected}, got {size}")
-    if size < MIN_SOURCE_BYTES:
-        raise RuntimeError(f"Dictionary download is unexpectedly small: {size} bytes")
-    return last_modified, size
+            size = target.stat().st_size
+            expected = int(content_length) if content_length and content_length.isdigit() else None
+            if expected is not None and size != expected:
+                raise RuntimeError(
+                    f"Dictionary download incomplete: expected {expected}, got {size}"
+                )
+            if size < MIN_SOURCE_BYTES:
+                raise RuntimeError(
+                    f"Dictionary download is unexpectedly small: {size} bytes"
+                )
+            return last_modified, size
+        except Exception as exc:
+            last_error = exc
+            target.unlink(missing_ok=True)
+            if attempt < 3:
+                time.sleep(attempt * 3)
+
+    raise RuntimeError(f"Unable to download dictionary after 3 attempts: {last_error}")
 
 
 def find_translation_table(connection: sqlite3.Connection) -> tuple[str, str, str]:
