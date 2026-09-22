@@ -2,6 +2,7 @@ import { useMemo,useState } from 'react'
 import { readingGrades,readingLibrary,readingsForGrade,type ReadingEntry } from '../data/readingLibrary'
 import { commonIrregularBases,readingWordDictionary } from '../data/readingDictionary'
 import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
+import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
 import type { ActivityKind,LearningItem } from '../types'
 
 type TranslationMode='hidden'|'parallel'|'russian'
@@ -23,6 +24,7 @@ type Lookup={
 
 const completedKey='seng-reading-completed-v1'
 const viewKey='seng-reading-view-v2'
+const booksCompletedKey='seng-reading-longforms-completed-v1'
 
 export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   const initialGrade=gradeForLevel(level)
@@ -33,6 +35,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   const[fontScale,setFontScale]=useState(1)
   const[lookup,setLookup]=useState<Lookup|null>(null)
   const[completed,setCompleted]=useState<Set<string>>(()=>loadCompleted())
+  const[booksCompleted,setBooksCompleted]=useState<Set<number>>(()=>loadBooksCompleted())
 
   const entries=useMemo(()=>readingsForGrade(grade),[grade])
   const entry=readingLibrary.find(item=>item.id===entryId)??entries[0]??readingLibrary[0]
@@ -100,7 +103,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
         <h2>Классика для погружения</h2>
         <p>По умолчанию открывается полноценная длинная адаптация выбранной классики: несколько больших абзацев, 8–20 минут непрерывного чтения и живой словарь. Короткие сцены оставлены отдельно для спокойного разбора.</p>
       </div>
-      <div className="reading-summary"><strong>{completed.size}/100</strong><span>частей прочитано</span></div>
+      <div className="reading-summary"><strong>{booksCompleted.size}/10</strong><span>длинных чтений</span><small>{completed.size}/100 коротких частей</small></div>
     </section>
 
     <div className="grade-strip" aria-label="Уровень чтения">
@@ -213,12 +216,16 @@ function ReadingSection({entry,mode,selected,onWord,bare=false}:{entry:ReadingEn
 }
 
 function InteractiveText({entry,selected,onWord}:{entry:ReadingEntry;selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
-  const english=splitSentences(entry.text),russian=splitSentences(entry.translation)
-  return <div className="interactive-reading-text">{english.map((sentence,sentenceIndex)=><span className="reading-sentence" key={entry.id+':'+sentenceIndex}>
+  return <InteractiveBilingualText en={entry.text} ru={entry.translation} keyPrefix={entry.id} selected={selected} onWord={onWord}/>
+}
+
+function InteractiveBilingualText({en,ru,keyPrefix,selected,onWord}:{en:string;ru:string;keyPrefix:string;selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
+  const english=splitSentences(en),russian=splitSentences(ru)
+  return <div className="interactive-reading-text">{english.map((sentence,sentenceIndex)=><span className="reading-sentence" key={keyPrefix+':'+sentenceIndex}>
     {tokenize(sentence).map((token,index)=>{
       if(!isWord(token))return <span key={index}>{token}</span>
       const active=Boolean(selected&&normalize(token)===normalize(selected))
-      return <button className={active?'selected-word':''} key={index} onClick={()=>onWord(token,sentence,russian[sentenceIndex]??entry.translation)}>{token}</button>
+      return <button className={active?'selected-word':''} key={index} onClick={()=>onWord(token,sentence,russian[sentenceIndex]??ru)}>{token}</button>
     })}{sentenceIndex<english.length-1?' ':''}
   </span>)}</div>
 }
@@ -308,6 +315,8 @@ function gradeForLevel(level:string){
 }
 function loadCompleted(){try{return new Set<string>(JSON.parse(localStorage.getItem(completedKey)??'[]'))}catch{return new Set<string>()}}
 function saveCompleted(items:Set<string>){try{localStorage.setItem(completedKey,JSON.stringify([...items]))}catch{/* storage can be unavailable */}}
+function loadBooksCompleted(){try{return new Set<number>(JSON.parse(localStorage.getItem(booksCompletedKey)??'[]'))}catch{return new Set<number>()}}
+function saveBooksCompleted(items:Set<number>){try{localStorage.setItem(booksCompletedKey,JSON.stringify([...items]))}catch{/* storage can be unavailable */}}
 function loadView():ReadingView{try{return localStorage.getItem(viewKey)==='part'?'part':'immersive'}catch{return'immersive'}}
 function saveView(view:ReadingView){try{localStorage.setItem(viewKey,view)}catch{/* storage can be unavailable */}}
 function speak(text:string,country?:string){
