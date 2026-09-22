@@ -452,6 +452,24 @@
 .dictionary-translation.sentence-fallback{
   background:var(--surface-soft);
 }
+.dictionary-loading{
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:10px;
+}
+.dictionary-loading>div{
+  display:grid;
+  gap:4px;
+}
+.dictionary-spinner{
+  width:18px;
+  height:18px;
+  border:2px solid color-mix(in srgb,var(--accent) 20%,var(--border));
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:dictionary-spin .7s linear infinite;
+}
+@keyframes dictionary-spin{to{transform:rotate(360deg)}}
 .context-pair{
   display:grid;
   gap:6px;
