@@ -4,38 +4,89 @@ const endpoint='https://api.mymemory.translated.net/get'
 
 type CacheRecord={translation:string;updatedAt:number}
 type CacheShape=Record<string,CacheRecord>
+type DictionaryShard=Record<string,string>
+
+export type ReadingTranslationResult={
+  translation:string
+  source:'site'|'online'
+  base:string
+}
 
 const memoryCache=new Map<string,string>()
-const inflight=new Map<string,Promise<string|null>>()
+const inflight=new Map<string,Promise<ReadingTranslationResult|null>>()
+const shardCache=new Map<string,Promise<DictionaryShard|null>>()
 
-export async function translateReadingWord(term:string):Promise<string|null>{
+export async function translateReadingWord(term:string,candidates:string[]=[]):Promise<ReadingTranslationResult|null>{
   const key=normalize(term)
   if(!key)return null
 
+  // Main path: sENG's own dictionary files hosted on the same origin.
+  const siteHit=await lookupSiteDictionary([key,...candidates])
+  if(siteHit)return siteHit
+
+  // Secondary path: a translation fetched previously and cached in this browser.
   const memoryHit=memoryCache.get(key)
-  if(memoryHit)return memoryHit
+  if(memoryHit)return{translation:memoryHit,source:'online',base:key}
 
   const stored=readStoredCache()
   const storedHit=stored[key]?.translation
   if(storedHit){
     memoryCache.set(key,storedHit)
-    return storedHit
+    return{translation:storedHit,source:'online',base:key}
   }
 
+  // Last resort only: external machine translation.
   const pending=inflight.get(key)
   if(pending)return pending
 
   const request=fetchTranslation(key)
     .then(translation=>{
-      if(translation){
-        memoryCache.set(key,translation)
-        writeStoredCache(key,translation)
-      }
-      return translation
+      if(!translation)return null
+      memoryCache.set(key,translation)
+      writeStoredCache(key,translation)
+      return{translation,source:'online' as const,base:key}
     })
     .finally(()=>inflight.delete(key))
 
   inflight.set(key,request)
+  return request
+}
+
+async function lookupSiteDictionary(candidates:string[]):Promise<ReadingTranslationResult|null>{
+  const normalized=[...new Set(candidates.map(normalize).filter(Boolean))]
+  for(const candidate of normalized){
+    const bucket=bucketFor(candidate)
+    const shard=await loadShard(bucket)
+    const translation=shard?.[candidate]
+    if(translation)return{translation,source:'site',base:candidate}
+  }
+  return null
+}
+
+function bucketFor(term:string){
+  const first=term.charAt(0)
+  return first>='a'&&first<='z'?first:'_'
+}
+
+function loadShard(bucket:string):Promise<DictionaryShard|null>{
+  const cached=shardCache.get(bucket)
+  if(cached)return cached
+
+  const request=(async()=>{
+    try{
+      const base=import.meta.env.BASE_URL||'./'
+      const url=new URL(`${base}dictionary/en-ru/${bucket}.json`,window.location.href)
+      const response=await fetch(url.toString(),{cache:'force-cache'})
+      if(!response.ok)return null
+      const data=await response.json() as unknown
+      if(!data||typeof data!=='object'||Array.isArray(data))return null
+      return data as DictionaryShard
+    }catch{
+      return null
+    }
+  })()
+
+  shardCache.set(bucket,request)
   return request
 }
 
@@ -111,7 +162,12 @@ function looksLikeApiWarning(value:string){
 }
 
 function normalize(value:string){
-  return value.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z' -]/g,'').replace(/\s+/g,' ').trim()
+  return value.toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/[‐‑]/g,'-')
+    .replace(/[^a-z' -]/g,'')
+    .replace(/\s+/g,' ')
+    .trim()
 }
 
 function readStoredCache():CacheShape{
