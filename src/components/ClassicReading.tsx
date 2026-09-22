@@ -21,7 +21,7 @@ type Lookup={
   contextTranslation:string
   phrase?:[string,string]
   loading?:boolean
-  source?:'local'|'online'
+  source?:'local'|'site'|'online'
   failed?:boolean
 }
 
@@ -93,11 +93,11 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
     }
 
     setLookup({term,context,contextTranslation,phrase,loading:true})
-    void translateReadingWord(term).then(translation=>{
+    void translateReadingWord(term,lemmaCandidates(normalize(term))).then(result=>{
       setLookup(current=>{
         if(!current||normalize(current.term)!==normalize(term)||current.context!==context)return current
-        if(!translation)return{...current,loading:false,failed:true}
-        return{...current,translation,base:term,loading:false,failed:false,source:'online'}
+        if(!result)return{...current,loading:false,failed:true}
+        return{...current,translation:result.translation,base:result.base,loading:false,failed:false,source:result.source}
       })
     })
   }
@@ -258,15 +258,16 @@ function DictionaryPanel({lookup,saveable,onClose,onSave}:{lookup:Lookup|null;sa
     {lookup?<div className="dictionary-card">
       <div className="dictionary-top"><div><p className="eyebrow">СЛОВАРЬ В ЧТЕНИИ</p><h3>{lookup.term}</h3></div><button className="word-close" onClick={onClose} aria-label="Закрыть перевод">×</button></div>
       {lookup.loading
-        ? <div className="dictionary-translation dictionary-loading"><span className="dictionary-spinner" aria-hidden="true"/><div><strong>Ищу перевод…</strong><small>Этого слова нет в локальном словаре — подключаю полный EN → RU поиск.</small></div></div>
+        ? <div className="dictionary-translation dictionary-loading"><span className="dictionary-spinner" aria-hidden="true"/><div><strong>Ищу перевод…</strong><small>Сначала проверяю полную базу sENG; внешний перевод используется только если слова там нет.</small></div></div>
         : lookup.translation
-          ? <div className="dictionary-translation"><strong>{lookup.translation}</strong>{lookup.base&&normalize(lookup.base)!==normalize(lookup.term)&&<small>Форма слова → {lookup.base}</small>}{lookup.source==='online'&&<small>Онлайн-словарь · перевод сохранён в кэш браузера</small>}</div>
+          ? <div className="dictionary-translation"><strong>{lookup.translation}</strong>{lookup.base&&normalize(lookup.base)!==normalize(lookup.term)&&<small>Форма слова → {lookup.base}</small>}{lookup.source==='site'&&<small>Локальная база sENG · WikDict / Wiktionary</small>}{lookup.source==='online'&&<small>Резервный онлайн-перевод · сохранён в кэш браузера</small>}</div>
           : lookup.phrase
             ? <div className="dictionary-translation phrase-hit"><small>Отдельный перевод сейчас недоступен, но слово встречается в выражении</small><strong>{lookup.phrase[0]}</strong><span>{lookup.phrase[1]}</span></div>
             : <div className="dictionary-translation sentence-fallback"><small>{lookup.failed?'Не удалось обратиться к онлайн-словарю. Перевод предложения ниже всё равно поможет не прерывать чтение.':'Подбираю перевод по контексту.'}</small></div>}
       <div className="context-pair"><span>Контекст</span><p>{lookup.context}</p><span>Перевод предложения</span><p>{lookup.contextTranslation}</p></div>
       {saveable&&!lookup.loading&&<button className="primary-action" onClick={onSave}>＋ {lookup.translation?'Добавить в обучение':'Сохранить выражение'}</button>}
-    </div>:<div className="dictionary-empty"><span>Aa</span><strong>Нажми на любое слово</strong><p>Сначала используется быстрый локальный словарь, а незнакомые слова автоматически переводятся онлайн и кэшируются.</p></div>}
+      <p className="dictionary-source">Основная база: <a href="https://www.wikdict.com/" target="_blank" rel="noreferrer">WikDict / Wiktionary</a> · CC BY-SA. Онлайн-перевод — только резерв.</p>
+    </div>:<div className="dictionary-empty"><span>Aa</span><strong>Нажми на любое слово</strong><p>Основной словарь хранится прямо на sENG и загружается по буквам. Внешний перевод нужен только для редких отсутствующих слов.</p></div>}
   </aside>
 }
 
