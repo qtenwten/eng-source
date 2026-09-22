@@ -1,6 +1,7 @@
 import { useMemo,useState } from 'react'
 import { readingGrades,readingLibrary,readingsForGrade,type ReadingEntry } from '../data/readingLibrary'
 import { commonIrregularBases,readingWordDictionary } from '../data/readingDictionary'
+import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
 import type { ActivityKind,LearningItem } from '../types'
 
 type TranslationMode='hidden'|'parallel'|'russian'
@@ -37,10 +38,11 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   const entry=readingLibrary.find(item=>item.id===entryId)??entries[0]??readingLibrary[0]
   const lexicon=useMemo(()=>buildLexicon(allItems),[allItems])
   const gradeGlossary=useMemo(()=>buildGradeGlossary(entries),[entries])
-  const fullText=useMemo(()=>entries.map(item=>item.text).join(' '),[entries])
+  const longform=useMemo(()=>longformForGrade(grade),[grade])
+  const fullText=useMemo(()=>longform.sections.map(section=>section.en).join(' '),[longform])
   const visibleText=view==='immersive'?fullText:entry.text
   const wordCount=countWords(visibleText)
-  const readingMinutes=estimateLearnerMinutes(visibleText)
+  const readingMinutes=view==='immersive'?longform.minutes:estimateLearnerMinutes(visibleText)
   const gradeDone=entries.filter(item=>completed.has(item.id)).length
 
   const chooseGrade=(next:number)=>{
@@ -60,7 +62,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
     const targets=view==='immersive'?entries:[entry]
     const fresh=targets.filter(item=>!completed.has(item.id))
     if(!fresh.length)return
-    onActivity('reading',estimateLearnerMinutes(fresh.map(item=>item.text).join(' ')))
+    onActivity('reading',view==='immersive'?longform.minutes:estimateLearnerMinutes(fresh.map(item=>item.text).join(' ')))
     const next=new Set(completed)
     fresh.forEach(item=>next.add(item.id))
     setCompleted(next)
@@ -138,7 +140,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
         <header className="reader-head">
           <div>
             <p className="eyebrow">{view==='immersive'?'LONGFORM ADAPTATION':entry.country+' · '+entry.work}</p>
-            <h2>{view==='immersive'?readingGrades[grade-1]?.work:entry.title}</h2>
+            <h2>{view==='immersive'?longform.title:entry.title}</h2>
             <p>{entry.author} · учебная адаптация sENG · {wordCount.toLocaleString('ru-RU')} слов · ≈ {readingMinutes} мин</p>
           </div>
           <button className="speak-reading" onClick={()=>speak(visibleText,activeCountry)} aria-label="Озвучить английский текст">▶ EN</button>
@@ -155,7 +157,7 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
 
         <div className={'reader-copy mode-'+mode+(view==='immersive'?' longform':'')} style={{fontSize:String(fontScale)+'em'}}>
           {view==='immersive'
-            ? <Longform entries={entries} mode={mode} selected={lookup?.term} onWord={openWord}/>
+            ? <Longform longform={longform} mode={mode} selected={lookup?.term} onWord={openWord}/>
             : <ReadingSection entry={entry} mode={mode} selected={lookup?.term} onWord={openWord}/>}
         </div>
 
@@ -182,11 +184,24 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   </div>
 }
 
-function Longform({entries,mode,selected,onWord}:{entries:ReadingEntry[];mode:TranslationMode;selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
-  return <div className="longform-stack">{entries.map((item,index)=><section className="longform-section" key={item.id}>
-    <div className="longform-marker"><span>{String(index+1).padStart(2,'0')}</span><div><small>{item.cefr}</small><h3>{item.title}</h3></div></div>
-    <ReadingSection entry={item} mode={mode} selected={selected} onWord={onWord} bare/>
+function Longform({longform,mode,selected,onWord}:{longform:ReadingLongform;mode:TranslationMode;selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
+  return <div className="longform-stack">{longform.sections.map((section,index)=><section className="longform-section" key={longform.grade+':'+index}>
+    <div className="longform-marker"><span>{String(index+1).padStart(2,'0')}</span><div><small>IMMERSION</small><h3>{index===0?'Начало':index===longform.sections.length-1?'Финал':'Продолжение'}</h3></div></div>
+    {mode!=='russian'&&<InteractiveLongformParagraph section={section} selected={selected} onWord={onWord}/>}
+    {mode==='parallel'&&<div className="parallel-translation"><span>Перевод абзаца</span><p>{section.ru}</p></div>}
+    {mode==='russian'&&<div className="russian-reading"><p>{section.ru}</p></div>}
   </section>)}</div>
+}
+
+function InteractiveLongformParagraph({section,selected,onWord}:{section:{en:string;ru:string};selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
+  const english=splitSentences(section.en)
+  return <div className="interactive-reading-text">{english.map((sentence,sentenceIndex)=><span className="reading-sentence" key={sentenceIndex}>
+    {tokenize(sentence).map((token,index)=>{
+      if(!isWord(token))return <span key={index}>{token}</span>
+      const active=Boolean(selected&&normalize(token)===normalize(selected))
+      return <button className={active?'selected-word':''} key={index} onClick={()=>onWord(token,sentence,section.ru)}>{token}</button>
+    })}{sentenceIndex<english.length-1?' ':''}
+  </span>)}</div>
 }
 
 function ReadingSection({entry,mode,selected,onWord,bare=false}:{entry:ReadingEntry;mode:TranslationMode;selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void;bare?:boolean}){
