@@ -17,7 +17,8 @@ interface Props{
 }
 
 export function LearningTools(props:Props){
-  return <div className="tool-overlay" role="dialog" aria-modal="true"><section className="tool-sheet"><header className="tool-header"><button className="icon-button" onClick={props.onClose} aria-label="Закрыть">×</button><div><p className="eyebrow">sENG LEARNING LAB</p><h2>{toolTitle(props.tool)}</h2></div></header><div className="tool-body">{renderTool(props)}</div></section></div>
+  const reading=props.tool==='reading'
+  return <div className={reading?'tool-overlay reading-tool-overlay':'tool-overlay'} role="dialog" aria-modal="true"><section className={reading?'tool-sheet reading-tool-sheet':'tool-sheet'}><header className="tool-header"><button className="icon-button" onClick={props.onClose} aria-label="Закрыть">×</button><div><p className="eyebrow">sENG LEARNING LAB</p><h2>{toolTitle(props.tool)}</h2></div></header><div className={reading?'tool-body reading-tool-body':'tool-body'}>{renderTool(props)}</div></section></div>
 }
 
 function renderTool(props:Props){
