@@ -3168,40 +3168,6 @@ export const readingLibrary:ReadingEntry[]=[
     ]
   },
   {
-    "id": "g9-two-worlds",
-    "grade": 9,
-    "cefr": "B2–C1",
-    "country": "US",
-    "work": "The Call of the Wild",
-    "author": "Jack London",
-    "title": "Between Two Worlds",
-    "minutes": 10,
-    "text": "Throughout the novel, Buck exists between two systems: the human world of ownership and work, and the wild world of instinct and survival. London does not make either world simple. Human beings can show cruelty or deep loyalty, while nature can offer freedom and sudden death. Buck’s transformation is powerful because it is not a return to innocence; it is a movement toward a different set of rules that he has learned to understand.",
-    "translation": "На протяжении романа Бак существует между двумя системами: человеческим миром собственности и труда и диким миром инстинкта и выживания. Лондон не делает ни один из миров простым. Люди способны и на жестокость, и на глубокую преданность, а природа может дать свободу и внезапную смерть. Превращение Бака сильно именно потому, что это не возвращение к невинности, а переход к другому набору правил, которые он научился понимать.",
-    "glossary": [
-      [
-        "throughout the novel",
-        "на протяжении романа"
-      ],
-      [
-        "exist between",
-        "существовать между"
-      ],
-      [
-        "deep loyalty",
-        "глубокая преданность"
-      ],
-      [
-        "a return to innocence",
-        "возвращение к невинности"
-      ],
-      [
-        "a different set of rules",
-        "другой набор правил"
-      ]
-    ]
-  },
-  {
     "id": "g10-marshes",
     "grade": 10,
     "cefr": "B2–C1",
