@@ -2,7 +2,6 @@ import { useMemo,useState } from 'react'
 import { readingGrades,readingLibrary,readingsForGrade,type ReadingEntry } from '../data/readingLibrary'
 import { commonIrregularBases,readingWordDictionary } from '../data/readingDictionary'
 import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
-import { longformForGrade,type ReadingLongform } from '../data/readingLongforms'
 import type { ActivityKind,LearningItem } from '../types'
 
 type TranslationMode='hidden'|'parallel'|'russian'
@@ -62,12 +61,19 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
   }
   const setViewAndStore=(next:ReadingView)=>{setView(next);saveView(next);setLookup(null)}
   const markDone=()=>{
-    const targets=view==='immersive'?entries:[entry]
-    const fresh=targets.filter(item=>!completed.has(item.id))
-    if(!fresh.length)return
-    onActivity('reading',view==='immersive'?longform.minutes:estimateLearnerMinutes(fresh.map(item=>item.text).join(' ')))
+    if(view==='immersive'){
+      if(booksCompleted.has(grade))return
+      onActivity('reading',longform.minutes)
+      const next=new Set(booksCompleted)
+      next.add(grade)
+      setBooksCompleted(next)
+      saveBooksCompleted(next)
+      return
+    }
+    if(completed.has(entry.id))return
+    onActivity('reading',estimateLearnerMinutes(entry.text))
     const next=new Set(completed)
-    fresh.forEach(item=>next.add(item.id))
+    next.add(entry.id)
     setCompleted(next)
     saveCompleted(next)
   }
@@ -174,10 +180,10 @@ export function ClassicReading({level,allItems,onSave,onActivity}:Props){
 
         <footer className="reader-finish">
           <p>{view==='immersive'
-            ? gradeDone===10?'✓ Весь уровень уже отмечен прочитанным.':'Большое чтение засчитает этот уровень целиком. Лучше начать без русского и включать перевод только там, где действительно теряется смысл.'
+            ? booksCompleted.has(grade)?'✓ Это большое чтение уже отмечено прочитанным.':'Большое чтение учитывается отдельно от коротких сцен. Лучше начать без русского и включать перевод только там, где действительно теряется смысл.'
             : completed.has(entry.id)?'✓ Эта часть уже засчитана.':'Отметь часть после настоящего чтения, а не после быстрого просмотра.'}</p>
-          <button className="primary-action" disabled={view==='immersive'?gradeDone===10:completed.has(entry.id)} onClick={markDone}>
-            {view==='immersive'?(gradeDone===10?'Уровень прочитан ✓':'Отметить большое чтение'):(completed.has(entry.id)?'Прочитано ✓':'Отметить прочитанным')}
+          <button className="primary-action" disabled={view==='immersive'?booksCompleted.has(grade):completed.has(entry.id)} onClick={markDone}>
+            {view==='immersive'?(booksCompleted.has(grade)?'Большое чтение пройдено ✓':'Отметить большое чтение'):(completed.has(entry.id)?'Прочитано ✓':'Отметить прочитанным')}
           </button>
         </footer>
       </article>
@@ -197,12 +203,12 @@ function Longform({longform,mode,selected,onWord}:{longform:ReadingLongform;mode
 }
 
 function InteractiveLongformParagraph({section,selected,onWord}:{section:{en:string;ru:string};selected?:string;onWord:(term:string,context:string,contextTranslation:string)=>void}){
-  const english=splitSentences(section.en)
+  const english=splitSentences(section.en),russian=splitSentences(section.ru)
   return <div className="interactive-reading-text">{english.map((sentence,sentenceIndex)=><span className="reading-sentence" key={sentenceIndex}>
     {tokenize(sentence).map((token,index)=>{
       if(!isWord(token))return <span key={index}>{token}</span>
       const active=Boolean(selected&&normalize(token)===normalize(selected))
-      return <button className={active?'selected-word':''} key={index} onClick={()=>onWord(token,sentence,section.ru)}>{token}</button>
+      return <button className={active?'selected-word':''} key={index} onClick={()=>onWord(token,sentence,russian[sentenceIndex]??section.ru)}>{token}</button>
     })}{sentenceIndex<english.length-1?' ':''}
   </span>)}</div>
 }
