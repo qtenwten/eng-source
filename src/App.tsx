@@ -20,6 +20,7 @@ import './study-enhancements.css'
 import './verb-table.css'
 import './reading-classics.css'
 import './books.css'
+import './daily-plan.css'
 
 type SessionKind=ItemKind|'due'|'new'
 type Availability=Record<ItemKind,number>
@@ -58,6 +59,7 @@ export default function App(){
     else if(module==='new'&&newItems.length)setSessionKind('new')
     else if(module==='listening')setTool('listening')
     else if(module==='speaking')setTool('production')
+    else if(module==='reading'||module==='books'||module==='errors'||module==='production')setTool(module)
     else if(module==='settings')setSection('profile')
   }
 
@@ -70,7 +72,7 @@ export default function App(){
     </aside>
     <main className="main-content">
       <header className="mobile-topbar"><div className="brand"><span className="brand-mark">s</span><strong>sENG</strong></div><span className="level-chip">{state.level}</span></header>
-      {section==='today'&&<Today learner={state} stats={stats} dueCount={dueItems.length} newCount={newItems.length} sessionLimit={sessionLimit} availability={availableByKind} onStart={startPrimary} onOpenModule={openModule}/>} 
+      {section==='today'&&<Today learner={state} stats={stats} dueCount={dueItems.length} newCount={newItems.length} onStart={startPrimary} onOpenModule={openModule}/>} 
       {section==='learn'&&<Learn availability={availableByKind} onStartKind={setSessionKind} onOpenTool={setTool}/>} 
       {section==='practice'&&<Practice dueCount={dueItems.length} newCount={newItems.length} sessionLimit={sessionLimit} onStart={startPrimary} onOpenTool={setTool}/>} 
       {section==='progress'&&<Progress learner={state} stats={stats}/>} 
