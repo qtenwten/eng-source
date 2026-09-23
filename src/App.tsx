@@ -19,6 +19,7 @@ import './productivity.css'
 import './study-enhancements.css'
 import './verb-table.css'
 import './reading-classics.css'
+import './books.css'
 
 type SessionKind=ItemKind|'due'|'new'
 type Availability=Record<ItemKind,number>

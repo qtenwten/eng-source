@@ -32,6 +32,9 @@ jobs:
       - name: Build local English-Russian dictionary
         run: python3 scripts/build-local-dictionary.py
 
+      - name: Build full books library
+        run: python3 scripts/build-books.py
+
       - name: Typecheck
         run: npm run check
 
