@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "check": "tsc -b --pretty false && npm run validate:content",
-    "validate:content": "node scripts/validate-content.mjs"
+    "check": "tsc -b --pretty false && npm run validate:content && npm run test:daily-plan",
+    "validate:content": "node scripts/validate-content.mjs",
+    "test:daily-plan": "node --experimental-strip-types scripts/test-daily-plan.mjs"
   },
   "dependencies": {
     "react": "19.3.0",
