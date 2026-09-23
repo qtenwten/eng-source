@@ -188,7 +188,7 @@ async function fetchTranslation(term:string):Promise<string|null>{
 
     for(const candidate of candidates){
       const cleaned=cleanTranslation(candidate)
-      if(cleaned&&normalize(cleaned)!==term&&!looksLikeApiWarning(cleaned))return cleaned
+      if(cleaned&&normalize(cleaned)!==normalize(term)&&!looksLikeApiWarning(cleaned))return cleaned
     }
     return null
   }catch{
