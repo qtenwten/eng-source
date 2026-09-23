@@ -1,5 +1,7 @@
 const cacheKey='seng-reading-online-dictionary-v1'
 const maxCacheEntries=3000
+const contextCacheKey='seng-reading-context-translations-v1'
+const maxContextCacheEntries=1000
 const endpoint='https://api.mymemory.translated.net/get'
 
 type CacheRecord={translation:string;updatedAt:number}
@@ -50,6 +52,22 @@ export async function translateReadingWord(term:string,candidates:string[]=[]):P
 
   inflight.set(key,request)
   return request
+}
+
+export async function translateReadingContext(text:string):Promise<string|null>{
+  const source=text.replace(/\s+/g,' ').trim()
+  if(!source)return null
+
+  const cache=readContextCache()
+  const hit=cache[source]?.translation
+  if(hit)return hit
+
+  const translation=await fetchTranslation(source)
+  if(translation){
+    writeContextCache(source,translation)
+    return translation
+  }
+  return null
 }
 
 async function lookupSiteDictionary(candidates:string[]):Promise<ReadingTranslationResult|null>{
@@ -170,7 +188,7 @@ async function fetchTranslation(term:string):Promise<string|null>{
 
     for(const candidate of candidates){
       const cleaned=cleanTranslation(candidate)
-      if(cleaned&&normalize(cleaned)!==term&&!looksLikeApiWarning(cleaned))return cleaned
+      if(cleaned&&normalize(cleaned)!==normalize(term)&&!looksLikeApiWarning(cleaned))return cleaned
     }
     return null
   }catch{
@@ -215,6 +233,30 @@ function normalize(value:string){
     .replace(/[^a-z' -]/g,'')
     .replace(/\s+/g,' ')
     .trim()
+}
+
+function readContextCache():CacheShape{
+  try{
+    const raw=localStorage.getItem(contextCacheKey)
+    if(!raw)return{}
+    const parsed=JSON.parse(raw) as CacheShape
+    return parsed&&typeof parsed==='object'?parsed:{}
+  }catch{return{}}
+}
+
+function writeContextCache(source:string,translation:string){
+  try{
+    const cache=readContextCache()
+    cache[source]={translation,updatedAt:Date.now()}
+    const entries=Object.entries(cache)
+    if(entries.length>maxContextCacheEntries){
+      entries
+        .sort((a,b)=>a[1].updatedAt-b[1].updatedAt)
+        .slice(0,entries.length-maxContextCacheEntries)
+        .forEach(([key])=>delete cache[key])
+    }
+    localStorage.setItem(contextCacheKey,JSON.stringify(cache))
+  }catch{/* context translation still works for the current click */}
 }
 
 function readStoredCache():CacheShape{

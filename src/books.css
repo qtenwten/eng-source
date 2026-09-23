@@ -48,3 +48,33 @@
   .books-copy{padding-left:clamp(54px,5vw,90px);padding-right:clamp(54px,5vw,90px)}
   .book-paragraph,.book-inline-heading{max-width:90ch}
 }
+
+
+.books-filter-stack{display:grid;gap:9px;padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+.books-filter-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.books-filter-row>span{width:62px;flex:0 0 62px;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.books-levels{display:grid;gap:24px}
+.books-level-section{display:grid;gap:12px}
+.books-level-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;padding:0 2px 8px;border-bottom:1px solid var(--border)}
+.books-level-head h3{font-size:23px;margin:2px 0 3px}
+.books-level-head p:last-child{margin:0;color:var(--muted);font-size:10px;line-height:1.45}
+.books-level-head>strong{flex:0 0 auto;display:grid;place-items:center;min-width:34px;height:34px;padding:0 8px;border-radius:11px;background:var(--surface-soft);color:var(--accent-strong);font-size:12px}
+.book-card.adapted{background:linear-gradient(155deg,color-mix(in srgb,var(--accent-soft) 38%,var(--surface)),var(--surface))}
+.book-card.adapted .book-monogram{background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 16%,var(--surface-soft)),var(--surface-soft));box-shadow:inset 5px 0 0 color-mix(in srgb,var(--accent) 24%,transparent)}
+.adapted-part-translation{max-width:82ch;margin:28px 0 0;border:1px solid var(--border);border-radius:14px;background:var(--surface-soft);overflow:hidden}
+.adapted-part-translation summary{cursor:pointer;padding:11px 13px;color:var(--accent-strong);font-size:10px;font-weight:900;list-style:none}
+.adapted-part-translation summary::-webkit-details-marker{display:none}
+.adapted-part-translation p{margin:0;padding:0 13px 14px;color:var(--muted);font-size:.88em;line-height:1.72}
+.context-loading{display:flex;align-items:center;gap:8px;padding:9px 0;color:var(--muted)}
+.context-loading .dictionary-spinner{width:14px;height:14px;flex:0 0 auto}
+.context-loading small{font-size:9px}
+.context-pair .context-ru{color:var(--text);background:var(--surface-soft);padding:9px 10px;border-radius:10px}
+.context-pair .context-missing{color:var(--muted);font-style:italic}
+
+@media(max-width:699px){
+  .books-filter-row{align-items:flex-start}
+  .books-filter-row>span{width:100%;flex-basis:100%}
+  .books-level-head{align-items:flex-start}
+  .books-level-head h3{font-size:20px}
+  .adapted-part-translation{max-width:none}
+}
