@@ -1,6 +1,7 @@
 import { useMemo,useState } from 'react'
 import { listeningClips,productiveTasks } from '../data/productivity'
 import { ClassicReading } from './ClassicReading'
+import { BooksLibrary } from './BooksLibrary'
 import { countProductiveUses,masteryLabels,masteryStage } from '../lib/productivity'
 import type { ActivityKind,LearnerState,LearningItem,LearningTool,ProductiveMode } from '../types'
 
@@ -17,14 +18,15 @@ interface Props{
 }
 
 export function LearningTools(props:Props){
-  const reading=props.tool==='reading'
-  return <div className={reading?'tool-overlay reading-tool-overlay':'tool-overlay'} role="dialog" aria-modal="true"><section className={reading?'tool-sheet reading-tool-sheet':'tool-sheet'}><header className="tool-header"><button className="icon-button" onClick={props.onClose} aria-label="Закрыть">×</button><div><p className="eyebrow">sENG LEARNING LAB</p><h2>{toolTitle(props.tool)}</h2></div></header><div className={reading?'tool-body reading-tool-body':'tool-body'}>{renderTool(props)}</div></section></div>
+  const immersive=props.tool==='reading'||props.tool==='books'
+  return <div className={immersive?'tool-overlay reading-tool-overlay':'tool-overlay'} role="dialog" aria-modal="true"><section className={immersive?'tool-sheet reading-tool-sheet':'tool-sheet'}><header className="tool-header"><button className="icon-button" onClick={props.onClose} aria-label="Закрыть">×</button><div><p className="eyebrow">sENG LEARNING LAB</p><h2>{toolTitle(props.tool)}</h2></div></header><div className={immersive?'tool-body reading-tool-body':'tool-body'}>{renderTool(props)}</div></section></div>
 }
 
 function renderTool(props:Props){
   switch(props.tool){
     case'inbox':return <Inbox learner={props.learner} onAdd={props.onAddInbox}/>
     case'reading':return <ClassicReading level={props.learner.level} allItems={props.allItems} onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
+    case'books':return <BooksLibrary onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
     case'listening':return <Listening onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
     case'errors':return <Errors learner={props.learner} onAdd={props.onAddError} onPractice={props.onPracticeError}/>
     case'production':return <Production learner={props.learner} allItems={props.allItems} onRecord={props.onRecordProduction}/>
@@ -32,7 +34,7 @@ function renderTool(props:Props){
     case'active':return <ActiveVocabulary learner={props.learner} allItems={props.allItems}/>
   }
 }
-function toolTitle(tool:LearningTool){return{inbox:'Personal Inbox',reading:'Чтение',listening:'Аудирование',errors:'Мои ошибки',production:'Говорение и письмо',coach:'sENG Coach',active:'Активный словарь'}[tool]}
+function toolTitle(tool:LearningTool){return{inbox:'Personal Inbox',reading:'Чтение',books:'Книги',listening:'Аудирование',errors:'Мои ошибки',production:'Говорение и письмо',coach:'sENG Coach',active:'Активный словарь'}[tool]}
 
 function Inbox({learner,onAdd}:{learner:LearnerState;onAdd:Props['onAddInbox']}){
   const[text,setText]=useState(''),[translation,setTranslation]=useState(''),[context,setContext]=useState('')
