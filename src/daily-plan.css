@@ -1,0 +1,60 @@
+/* Adaptive daily route: responsive, theme-token-based and readable on phones. */
+.daily-route { display: grid; gap: 14px; }
+.daily-route .section-heading { margin-bottom: 0; }
+.daily-route-budget {
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 7px 11px; color: var(--muted); font-size: .82rem; white-space: nowrap;
+  background: var(--surface-strong);
+}
+.daily-route-intro, .daily-route-footnote {
+  margin: 0; color: var(--muted); line-height: 1.55;
+}
+.daily-route-intro { max-width: 68ch; font-size: .94rem; }
+.daily-route-footnote { font-size: .79rem; }
+.daily-route-status { display: grid; gap: 7px; font-size: .82rem; color: var(--muted); }
+.daily-route-track {
+  width: 100%; height: 7px; border-radius: 999px; overflow: hidden;
+  background: var(--surface-soft);
+}
+.daily-route-track > span {
+  display: block; height: 100%; border-radius: inherit;
+  background: var(--success); transition: width .2s ease;
+}
+.daily-route-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.daily-route-step {
+  width: 100%; min-width: 0; display: flex; align-items: flex-start; gap: 12px;
+  text-align: left; padding: 15px; border-radius: var(--radius-small);
+  border: 1px solid var(--border); background: var(--surface-strong); color: var(--text);
+  transition: border-color .15s ease, transform .15s ease;
+}
+.daily-route-step:not(:disabled):hover {
+  border-color: var(--accent); transform: translateY(-1px);
+}
+.daily-route-step:disabled { opacity: 1; cursor: default; }
+.daily-route-step.is-done { background: var(--surface-soft); }
+.daily-route-number {
+  flex: 0 0 32px; width: 32px; height: 32px; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-strong); border-radius: 10px;
+  font-size: .9rem; font-weight: 800;
+}
+.is-done .daily-route-number { background: var(--success); color: var(--surface-strong); }
+.daily-route-step-copy { min-width: 0; flex: 1; display: grid; gap: 6px; }
+.daily-route-step-copy strong { line-height: 1.3; font-size: .98rem; overflow-wrap: anywhere; }
+.daily-route-step-copy small { font-size: .83rem; color: var(--muted); line-height: 1.5; }
+.daily-route-step-copy em { font-size: .8rem; font-weight: 750; font-style: normal; color: var(--accent-strong); }
+.is-done .daily-route-step-copy em { color: var(--success); }
+.daily-route-duration {
+  flex: 0 0 auto; color: var(--muted); font-size: .78rem; white-space: nowrap;
+  padding-top: 7px;
+}
+@media (min-width: 760px) {
+  .daily-route-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .daily-route-step { min-height: 150px; }
+}
+@media (max-width: 390px) {
+  .daily-route-step { padding: 12px; gap: 9px; }
+  .daily-route-duration { font-size: .72rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-route-track > span, .daily-route-step { transition: none; }
+}
