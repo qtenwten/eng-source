@@ -48,7 +48,8 @@ export function StudySession({items,memory,onRate,onClose}:Props){
       setWritingFeedback({correct:false,message:`${parts.join(' · ')}. Попробуй ещё раз или открой ответ.`});return
     }
     if(!typedAnswer.trim()){setWritingFeedback({correct:false,message:'Сначала введи английский ответ.'});return}
-    if(normalize(typedAnswer)===normalize(item.answer)){setWritingFeedback({correct:true,message:'Верно. Теперь проверь контекст и оцени, насколько легко вспомнил.'});setRevealed(true)}
+    const accepted=[item.answer,...(item.acceptedAnswers??[])]
+    if(accepted.some(answer=>normalize(typedAnswer)===normalize(answer))){setWritingFeedback({correct:true,message:'Верно. Теперь проверь контекст и оцени, насколько легко вспомнил.'});setRevealed(true)}
     else setWritingFeedback({correct:false,message:'Пока не совпало. Проверь написание и попробуй ещё раз — правильный ответ пока скрыт.'})
   }
 
@@ -66,6 +67,7 @@ export function StudySession({items,memory,onRate,onClose}:Props){
         </div>:<div className="answer-area">
           {item.kind==='irregular'&&item.irregularForms?<IrregularAnswer item={item}/>:<div className="answer-main"><strong>{item.answer}</strong><span>{item.translation}</span></div>}
           <button className="sound-button" onClick={()=>speak(item.irregularForms?[item.irregularForms.base,item.irregularForms.past,item.irregularForms.participle].join(', '):item.answer)}>◖)) Слушать</button>
+          {item.acceptedAnswers?.length?<div className="answer-variants"><small>Ещё естественно</small><div>{item.acceptedAnswers.map(answer=><span key={answer}>{answer}</span>)}</div></div>:null}
           <InteractiveExample item={item} selected={selectedGloss} onSelect={setSelectedGloss}/>
           {item.note&&<p className="note">⌁ {item.note}</p>}
           {writingFeedback?.correct&&<p className="writing-feedback correct">✓ {writingFeedback.message}</p>}

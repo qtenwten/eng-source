@@ -2,6 +2,7 @@ import { useMemo,useState } from 'react'
 import { listeningClips,productiveTasks } from '../data/productivity'
 import { ClassicReading } from './ClassicReading'
 import { BooksLibrary } from './BooksLibrary'
+import { ConversationPhrases } from './ConversationPhrases'
 import { countProductiveUses,masteryLabels,masteryStage } from '../lib/productivity'
 import type { ActivityKind,LearnerState,LearningItem,LearningTool,ProductiveMode } from '../types'
 
@@ -15,6 +16,7 @@ interface Props{
   onPracticeError:(id:string,success:boolean)=>void
   onRecordActivity:(kind:ActivityKind,durationMinutes:number)=>void
   onRecordProduction:(taskId:string,mode:ProductiveMode,response:string,targets:string[],repeatAfterDays:number,durationMinutes?:number)=>{feedback:string[]}
+  onStartConversation:()=>void
 }
 
 export function LearningTools(props:Props){
@@ -24,6 +26,7 @@ export function LearningTools(props:Props){
 
 function renderTool(props:Props){
   switch(props.tool){
+    case'conversation':return <ConversationPhrases onStart={props.onStartConversation}/>
     case'inbox':return <Inbox learner={props.learner} onAdd={props.onAddInbox}/>
     case'reading':return <ClassicReading level={props.learner.level} allItems={props.allItems} onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
     case'books':return <BooksLibrary onSave={props.onAddInbox} onActivity={props.onRecordActivity}/>
@@ -34,7 +37,7 @@ function renderTool(props:Props){
     case'active':return <ActiveVocabulary learner={props.learner} allItems={props.allItems}/>
   }
 }
-function toolTitle(tool:LearningTool){return{inbox:'Personal Inbox',reading:'Чтение',books:'Книги',listening:'Аудирование',errors:'Мои ошибки',production:'Говорение и письмо',coach:'sENG Coach',active:'Активный словарь'}[tool]}
+function toolTitle(tool:LearningTool){return{inbox:'Personal Inbox',reading:'Чтение',books:'Книги',listening:'Аудирование',errors:'Мои ошибки',production:'Говорение и письмо',coach:'sENG Coach',active:'Активный словарь',conversation:'Разговорные фразы'}[tool]}
 
 function Inbox({learner,onAdd}:{learner:LearnerState;onAdd:Props['onAddInbox']}){
   const[text,setText]=useState(''),[translation,setTranslation]=useState(''),[context,setContext]=useState('')
