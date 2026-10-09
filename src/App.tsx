@@ -20,8 +20,9 @@ import './study-enhancements.css'
 import './verb-table.css'
 import './reading-classics.css'
 import './books.css'
+import './conversation-phrases.css'
 
-type SessionKind=ItemKind|'due'|'new'
+type SessionKind=ItemKind|'due'|'new'|'conversation'
 type Availability=Record<ItemKind,number>
 
 function sessionLimitForMinutes(minutes:number){if(minutes<=10)return 5;if(minutes<=15)return 7;if(minutes<=20)return 9;return 12}
@@ -45,6 +46,7 @@ export default function App(){
     if(!sessionKind)return[]
     if(sessionKind==='due')return dueItems.slice(0,sessionLimit)
     if(sessionKind==='new')return newItems.slice(0,sessionLimit)
+    if(sessionKind==='conversation')return [...dueItems.filter(item=>item.tags.includes('conversation-core')),...newItems.filter(item=>item.tags.includes('conversation-core'))].slice(0,sessionLimit)
     return [...dueItems.filter(item=>item.kind===sessionKind),...newItems.filter(item=>item.kind===sessionKind)].slice(0,sessionLimit)
   },[sessionKind,dueItems,newItems,sessionLimit])
   const startPrimary=()=>{if(dueItems.length)setSessionKind('due');else if(newItems.length)setSessionKind('new')}
@@ -78,7 +80,7 @@ export default function App(){
     </main>
     <BottomNav current={section} onChange={setSection}/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
-    {tool==='irregular-table'?<IrregularVerbTable onClose={()=>setTool(null)} onStartTest={()=>{setTool(null);setSessionKind('irregular')}}/>:tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction}/>} 
+    {tool==='irregular-table'?<IrregularVerbTable onClose={()=>setTool(null)} onStartTest={()=>{setTool(null);setSessionKind('irregular')}}/>:tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction} onStartConversation={()=>{setTool(null);setSessionKind('conversation')}}/>} 
   </div>
 }
 

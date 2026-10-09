@@ -8,6 +8,7 @@ const groups:Array<{kind:ItemKind;title:string;description:string;icon:string}>=
   {kind:'irregular',title:'Неправильные глаголы',description:'Сначала таблица V1/V2/V3, затем отдельный тест',icon:'↯'},
 ]
 const tools:Array<{id:LearningTool;title:string;description:string;icon:string}>=[
+  {id:'conversation',title:'Разговорные фразы',description:'Живые вопросы, ответы, реакции и small talk с естественными вариациями',icon:'Hi'},
   {id:'books',title:'Книги · оригиналы',description:'Полные произведения английской и американской классики с кликабельным словарём',icon:'B'},
   {id:'reading',title:'Чтение классики',description:'10 уровней адаптаций: длинное чтение для погружения + короткие сцены для разбора',icon:'R'},
   {id:'inbox',title:'Personal Inbox',description:'Добавляй слова и фразы из фильмов, игр, YouTube и жизни',icon:'＋'},

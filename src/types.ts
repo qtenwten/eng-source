@@ -4,7 +4,7 @@ export type NavSection = 'today' | 'learn' | 'practice' | 'progress' | 'profile'
 export type ItemKind = 'word' | 'chunk' | 'irregular'
 export type ReviewRating = 'again' | 'hard' | 'good' | 'easy'
 export type LearningGoal = 'conversation' | 'media' | 'travel' | 'work' | 'general'
-export type LearningTool = 'inbox' | 'reading' | 'books' | 'listening' | 'errors' | 'production' | 'coach' | 'active'
+export type LearningTool = 'inbox' | 'reading' | 'books' | 'listening' | 'errors' | 'production' | 'coach' | 'active' | 'conversation'
 export type AppTool = LearningTool | 'irregular-table'
 export type ProductiveMode = 'speaking' | 'writing'
 export type ActivityKind = 'reading' | 'listening' | 'speaking' | 'writing'
@@ -16,6 +16,8 @@ export interface LearningItem {
   kind: ItemKind
   prompt: string
   answer: string
+  /** Alternative natural answers accepted by written recall. */
+  acceptedAnswers?: string[]
   translation: string
   example: string
   /** Built-in content should provide this; personal Inbox context may not have a full-sentence translation yet. */

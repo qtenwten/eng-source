@@ -5,9 +5,11 @@ import { lexiconA2 } from './lexiconA2'
 import { lexiconB1 } from './lexiconB1'
 import { lexiconB2 } from './lexiconB2'
 import { irregularVerbItems } from './irregularVerbs'
+import { conversationPhraseItems } from './conversationPhrases'
 
 export const learningItems = [
   ...coreLexicon,
+  ...conversationPhraseItems,
   ...extendedLexicon,
   ...lexiconA1,
   ...lexiconA2,
