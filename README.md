@@ -34,6 +34,8 @@ Phone is the primary learning device; desktop uses the same product model with a
 - browser text-to-speech after answer reveal
 - versioned local persistence
 - PWA manifest + offline shell
+- in-app update notification for installed iOS/Android PWAs: checks build version on launch, focus and every five minutes; a user-triggered update activates the waiting service worker without clearing local learning progress
+- versioned service worker and version.json are generated at build time; never deploy public/sw.js directly without a production build
 - GitHub Actions typecheck + production build
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for technical boundaries and next steps.
