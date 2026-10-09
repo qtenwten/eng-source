@@ -2,6 +2,7 @@ import { useEffect,useMemo,useState } from 'react'
 import { useLearner } from './app/useLearner'
 import { resolveColorMode } from './app/theme'
 import { BottomNav } from './components/BottomNav'
+import { AppUpdateBanner } from './components/AppUpdateBanner'
 import { Today } from './components/Today'
 import { Learn } from './components/Learn'
 import { Practice } from './components/Practice'
@@ -21,6 +22,7 @@ import './verb-table.css'
 import './reading-classics.css'
 import './books.css'
 import './conversation-phrases.css'
+import './update.css'
 
 type SessionKind=ItemKind|'due'|'new'|'conversation'
 type Availability=Record<ItemKind,number>
@@ -51,7 +53,7 @@ export default function App(){
   },[sessionKind,dueItems,newItems,sessionLimit])
   const startPrimary=()=>{if(dueItems.length)setSessionKind('due');else if(newItems.length)setSessionKind('new')}
 
-  if(!state.onboardingComplete)return <div className={`app onboarding-app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/></div>
+  if(!state.onboardingComplete)return <div className={`app onboarding-app theme-${state.themeStyle} mode-${resolvedMode}`}><Onboarding onComplete={completeOnboarding}/><AppUpdateBanner/></div>
 
   const openModule=(module:string)=>{
     if(module==='verbs')setTool('irregular-table')
@@ -79,6 +81,7 @@ export default function App(){
       {section==='profile'&&<Profile learner={state} stats={stats} onThemeStyle={setThemeStyle} onColorMode={setColorMode} onPreferences={updateLearningPreferences} onReset={resetProgress}/>} 
     </main>
     <BottomNav current={section} onChange={setSection}/>
+    <AppUpdateBanner/>
     {sessionKind&&<StudySession items={sessionItems} memory={state.memory} onRate={rateItem} onClose={()=>setSessionKind(null)}/>} 
     {tool==='irregular-table'?<IrregularVerbTable onClose={()=>setTool(null)} onStartTest={()=>{setTool(null);setSessionKind('irregular')}}/>:tool&&<LearningTools tool={tool} learner={state} allItems={allItems} onClose={()=>setTool(null)} onAddInbox={addInbox} onAddError={addManualError} onPracticeError={practiceError} onRecordActivity={recordActivity} onRecordProduction={recordProduction} onStartConversation={()=>{setTool(null);setSessionKind('conversation')}}/>} 
   </div>
